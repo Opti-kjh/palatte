@@ -1,0 +1,67 @@
+{
+  "name": "design-system-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for converting Figma designs to React/Vue components using existing design system",
+  "main": "dist/index.js",
+  "type": "module",
+  "bin": {
+    "design-system-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "test": "jest",
+    "test:services": "tsx src/test.ts",
+    "mcp": "node dist/index.js",
+    "mcp:dev": "tsx src/index.ts",
+    "postinstall": "npm run build",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "design-system",
+    "figma",
+    "react",
+    "vue",
+    "cursor",
+    "ai",
+    "code-generation",
+    "component-library"
+  ],
+  "author": {
+    "name": "KJH",
+    "email": "kjh@deali.net"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/design-system-mcp.git"
+  },
+  "homepage": "https://github.com/your-username/design-system-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/your-username/design-system-mcp/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.4.0",
+    "axios": "^1.6.0",
+    "figma-api": "^1.11.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0"
+  }
+}

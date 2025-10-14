@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JeonSoJeong - 주문 관리 인터페이스</title>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 375px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* Header Section */
+        .header-section {
+            width: 100%;
+        }
+
+        .date-header {
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            background-color: #fcfcfc;
+            border: 1px solid #979797;
+            height: 38px;
+        }
+
+        .date-text {
+            font-size: 14px;
+            font-weight: 500;
+            color: #222222;
+        }
+
+        /* Order List Container */
+        .order-list-container {
+            width: 100%;
+            background-color: #ffffff;
+        }
+
+        .order-item {
+            width: 100%;
+            padding: 16px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #ebeeef;
+        }
+
+        .order-header {
+            margin-bottom: 12px;
+        }
+
+        .status-badges {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 28px;
+        }
+
+        .status-badge.waiting {
+            background-color: #feecf;
+            color: #fb475f;
+        }
+
+        .status-badge.completed {
+            background-color: #feecf;
+            color: #fb475f;
+        }
+
+        .status-badge.processing {
+            background-color: #feecf;
+            color: #fb475f;
+        }
+
+        .status-badge.received {
+            background-color: #feecf;
+            color: #fb475f;
+        }
+
+        .status-badge.shipping {
+            background-color: #feecf;
+            color: #fb475f;
+        }
+
+        .status-badge.delivered {
+            background-color: #ebeeef;
+            color: #686e7b;
+        }
+
+        .status-badge.cancelled {
+            background-color: #feecf;
+            color: #fb475f;
+        }
+
+        .payment-method,
+        .payment-type {
+            padding: 4px 8px;
+            background-color: #ffffff;
+            border: 1px solid #ebeeef;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #8f97a7;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 25px;
+        }
+
+        /* Product Info */
+        .product-info {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .product-image {
+            width: 70px;
+            height: 70px;
+            border-radius: 8px;
+            border: 1px solid #ebeeef;
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .product-image::before {
+            content: '📦';
+            font-size: 24px;
+            opacity: 0.3;
+        }
+
+        .product-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .product-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #222222;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .product-description {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .product-description p {
+            font-size: 12px;
+            color: #222222;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .price {
+            font-size: 14px;
+            font-weight: 600;
+            color: #222222;
+        }
+
+        /* Order Actions */
+        .order-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 8px;
+        }
+
+        .chat-icon {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .icon-container {
+            width: 16px;
+            height: 16px;
+            position: relative;
+        }
+
+        .chat-icon-bg {
+            width: 16px;
+            height: 16px;
+            background-color: #d0d6e1;
+            border-radius: 2px;
+        }
+
+        .chat-icon-content {
+            width: 12px;
+            height: 12px;
+            background-color: #d0d6e1;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            border-radius: 1px;
+        }
+
+        .chat-count {
+            font-size: 12px;
+            color: #3e4149;
+            font-weight: 500;
+        }
+
+        .arrow-icon {
+            width: 16px;
+            height: 16px;
+            position: relative;
+        }
+
+        .arrow-bg {
+            width: 16px;
+            height: 16px;
+            background-color: #bec5d2;
+            border-radius: 2px;
+        }
+
+        .arrow-content {
+            width: 6px;
+            height: 11px;
+            background-color: #bec5d2;
+            position: absolute;
+            top: 2.5px;
+            left: 5px;
+            border-radius: 1px;
+        }
+
+        .order-number {
+            font-size: 12px;
+            color: #a6adbd;
+            margin-bottom: 8px;
+        }
+
+        .divider {
+            width: 100%;
+            height: 1px;
+            background-color: #ebeeef;
+            margin: 8px 0;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn-cancel,
+        .btn-secondary {
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+        }
+
+        .btn-cancel {
+            background-color: #f5f6fb;
+            color: #3e4149;
+        }
+
+        .btn-cancel:hover {
+            background-color: #e8eaf0;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-secondary {
+            background-color: #f3f5f9;
+            color: #222222;
+        }
+
+        .btn-secondary:hover {
+            background-color: #e8eaf0;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Section Divider */
+        .section-divider {
+            width: 100%;
+            height: 8px;
+            background-color: #f5f6fb;
+            border: 1px solid #979797;
+            margin: 16px 0;
+        }
+
+        /* Status Badge Animations */
+        .status-badge {
+            transition: all 0.2s ease;
+        }
+
+        .status-badge:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Loading States */
+        .status-badge.processing {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 375px) {
+            .container {
+                max-width: 100%;
+                border-radius: 0;
+            }
+            
+            .order-item {
+                padding: 12px;
+            }
+            
+            .product-info {
+                gap: 8px;
+            }
+            
+            .product-image {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn-cancel,
+            .btn-secondary {
+                width: 100%;
+            }
+        }
+
+        /* Demo Info */
+        .demo-info {
+            text-align: center;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #ebeeef;
+        }
+
+        .demo-info h1 {
+            font-size: 18px;
+            color: #222222;
+            margin-bottom: 8px;
+        }
+
+        .demo-info p {
+            font-size: 14px;
+            color: #666666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="demo-info">
+            <h1>전소정 주문 관리 시스템</h1>
+            <p>Figma 디자인에서 변환된 React 컴포넌트 데모</p>
+        </div>
+
+        <div class="header-section">
+            <div class="date-header">
+                <span class="date-text">2021.08.20</span>
+            </div>
+        </div>
+
+        <div class="order-list-container">
+            <!-- Order Item 1 - 입금대기 -->
+            <div class="order-item">
+                <div class="order-header">
+                    <div class="status-badges">
+                        <div class="status-badge waiting">입금대기</div>
+                        <div class="payment-method">사입사방문</div>
+                        <div class="payment-type">현장결제</div>
+                    </div>
+                </div>
+
+                <div class="product-info">
+                    <div class="product-image"></div>
+                    <div class="product-details">
+                        <h3 class="product-title">디오트 2층 C26 JUNO (주노)</h3>
+                        <div class="product-description">
+                            <p>메쉬망사 배색 줄지니트 외 2건</p>
+                            <span class="price">30,000원</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-actions">
+                    <div class="chat-icon">
+                        <div class="icon-container">
+                            <div class="chat-icon-bg"></div>
+                            <div class="chat-icon-content"></div>
+                        </div>
+                        <span class="chat-count">0</span>
+                        <div class="arrow-icon">
+                            <div class="arrow-bg"></div>
+                            <div class="arrow-content"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-number">20210104900639</div>
+                <div class="divider"></div>
+
+                <div class="action-buttons">
+                    <button class="btn-cancel">주문취소</button>
+                    <button class="btn-secondary">계좌확인</button>
+                </div>
+            </div>
+
+            <!-- Order Item 2 - 결제완료 -->
+            <div class="order-item">
+                <div class="order-header">
+                    <div class="status-badges">
+                        <div class="status-badge completed">결제완료</div>
+                        <div class="payment-method">사입사방문</div>
+                        <div class="payment-type">현장결제</div>
+                    </div>
+                </div>
+
+                <div class="product-info">
+                    <div class="product-image"></div>
+                    <div class="product-details">
+                        <h3 class="product-title">디오트 2층 C26 JUNO (주노)</h3>
+                        <div class="product-description">
+                            <p>메쉬망사 배색 줄지니트 외 2건</p>
+                            <span class="price">30,000원</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-actions">
+                    <div class="chat-icon">
+                        <div class="icon-container">
+                            <div class="chat-icon-bg"></div>
+                            <div class="chat-icon-content"></div>
+                        </div>
+                        <span class="chat-count">0</span>
+                        <div class="arrow-icon">
+                            <div class="arrow-bg"></div>
+                            <div class="arrow-content"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-number">20210104900639</div>
+                <div class="divider"></div>
+
+                <div class="action-buttons">
+                    <button class="btn-cancel">주문취소</button>
+                </div>
+            </div>
+
+            <!-- Order Item 3 - 사입중 -->
+            <div class="order-item">
+                <div class="order-header">
+                    <div class="status-badges">
+                        <div class="status-badge processing">사입중</div>
+                        <div class="payment-method">사입사방문</div>
+                        <div class="payment-type">현장결제</div>
+                    </div>
+                </div>
+
+                <div class="product-info">
+                    <div class="product-image"></div>
+                    <div class="product-details">
+                        <h3 class="product-title">디오트 2층 C26 JUNO (주노)</h3>
+                        <div class="product-description">
+                            <p>메쉬망사 배색 줄지니트 외 2건</p>
+                            <span class="price">30,000원</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-actions">
+                    <div class="chat-icon">
+                        <div class="icon-container">
+                            <div class="chat-icon-bg"></div>
+                            <div class="chat-icon-content"></div>
+                        </div>
+                        <span class="chat-count">0</span>
+                        <div class="arrow-icon">
+                            <div class="arrow-bg"></div>
+                            <div class="arrow-content"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-number">20210104900639</div>
+                <div class="divider"></div>
+            </div>
+
+            <!-- Order Item 4 - 입고완료 -->
+            <div class="order-item">
+                <div class="order-header">
+                    <div class="status-badges">
+                        <div class="status-badge received">입고완료</div>
+                        <div class="payment-method">사입사방문</div>
+                        <div class="payment-type">현장결제</div>
+                    </div>
+                </div>
+
+                <div class="product-info">
+                    <div class="product-image"></div>
+                    <div class="product-details">
+                        <h3 class="product-title">디오트 2층 C26 JUNO (주노)</h3>
+                        <div class="product-description">
+                            <p>메쉬망사 배색 줄지니트 외 2건</p>
+                            <span class="price">30,000원</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-actions">
+                    <div class="chat-icon">
+                        <div class="icon-container">
+                            <div class="chat-icon-bg"></div>
+                            <div class="chat-icon-content"></div>
+                        </div>
+                        <span class="chat-count">0</span>
+                        <div class="arrow-icon">
+                            <div class="arrow-bg"></div>
+                            <div class="arrow-content"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-number">20210104900639</div>
+                <div class="divider"></div>
+
+                <div class="action-buttons">
+                    <button class="btn-cancel">주문취소</button>
+                    <button class="btn-secondary">배송조회</button>
+                    <button class="btn-secondary">미송 배송조회</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Divider -->
+        <div class="section-divider"></div>
+
+        <!-- Second Date Header -->
+        <div class="header-section">
+            <div class="date-header">
+                <span class="date-text">2021.08.17</span>
+            </div>
+        </div>
+
+        <div class="order-list-container">
+            <!-- Order Item 5 - 배송중 -->
+            <div class="order-item">
+                <div class="order-header">
+                    <div class="status-badges">
+                        <div class="status-badge shipping">배송중</div>
+                        <div class="payment-method">사입사방문</div>
+                        <div class="payment-type">현장결제</div>
+                    </div>
+                </div>
+
+                <div class="product-info">
+                    <div class="product-image"></div>
+                    <div class="product-details">
+                        <h3 class="product-title">디오트 2층 C26 JUNO (주노)</h3>
+                        <div class="product-description">
+                            <p>메쉬망사 배색 줄지니트 외 2건</p>
+                            <span class="price">30,000원</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-actions">
+                    <div class="chat-icon">
+                        <div class="icon-container">
+                            <div class="chat-icon-bg"></div>
+                            <div class="chat-icon-content"></div>
+                        </div>
+                        <span class="chat-count">0</span>
+                        <div class="arrow-icon">
+                            <div class="arrow-bg"></div>
+                            <div class="arrow-content"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-number">20210104900639</div>
+                <div class="divider"></div>
+
+                <div class="action-buttons">
+                    <button class="btn-secondary">배송조회</button>
+                </div>
+            </div>
+
+            <!-- Order Item 6 - 배송완료 -->
+            <div class="order-item">
+                <div class="order-header">
+                    <div class="status-badges">
+                        <div class="status-badge delivered">배송완료</div>
+                        <div class="payment-method">사입사방문</div>
+                        <div class="payment-type">현장결제</div>
+                    </div>
+                </div>
+
+                <div class="product-info">
+                    <div class="product-image"></div>
+                    <div class="product-details">
+                        <h3 class="product-title">디오트 2층 C26 JUNO (주노)</h3>
+                        <div class="product-description">
+                            <p>메쉬망사 배색 줄지니트 외 2건</p>
+                            <span class="price">30,000원</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-actions">
+                    <div class="chat-icon">
+                        <div class="icon-container">
+                            <div class="chat-icon-bg"></div>
+                            <div class="chat-icon-content"></div>
+                        </div>
+                        <span class="chat-count">0</span>
+                        <div class="arrow-icon">
+                            <div class="arrow-bg"></div>
+                            <div class="arrow-content"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-number">20210104900639</div>
+                <div class="divider"></div>
+
+                <div class="action-buttons">
+                    <button class="btn-secondary">배송조회</button>
+                </div>
+            </div>
+
+            <!-- Order Item 7 - 주문취소 -->
+            <div class="order-item">
+                <div class="order-header">
+                    <div class="status-badges">
+                        <div class="status-badge cancelled">주문취소</div>
+                        <div class="payment-method">사입사방문</div>
+                        <div class="payment-type">현장결제</div>
+                    </div>
+                </div>
+
+                <div class="product-info">
+                    <div class="product-image"></div>
+                    <div class="product-details">
+                        <h3 class="product-title">디오트 2층 C26 JUNO (주노)</h3>
+                        <div class="product-description">
+                            <p>메쉬망사 배색 줄지니트 외 2건</p>
+                            <span class="price">30,000원</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-actions">
+                    <div class="chat-icon">
+                        <div class="icon-container">
+                            <div class="chat-icon-bg"></div>
+                            <div class="chat-icon-content"></div>
+                        </div>
+                        <span class="chat-count">0</span>
+                        <div class="arrow-icon">
+                            <div class="arrow-bg"></div>
+                            <div class="arrow-content"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-number">20210104900639</div>
+                <div class="divider"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Interactive functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click handlers for buttons
+            const buttons = document.querySelectorAll('.btn-cancel, .btn-secondary');
+            buttons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const action = this.textContent;
+                    alert(`${action} 버튼이 클릭되었습니다!`);
+                });
+            });
+
+            // Add hover effects for status badges
+            const statusBadges = document.querySelectorAll('.status-badge');
+            statusBadges.forEach(badge => {
+                badge.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-1px)';
+                    this.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+                });
+                
+                badge.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                });
+            });
+
+            // Add click handler for chat icons
+            const chatIcons = document.querySelectorAll('.chat-icon');
+            chatIcons.forEach(icon => {
+                icon.addEventListener('click', function() {
+                    alert('채팅 기능이 클릭되었습니다!');
+                });
+            });
+
+            // Add click handler for product images
+            const productImages = document.querySelectorAll('.product-image');
+            productImages.forEach(image => {
+                image.addEventListener('click', function() {
+                    alert('상품 이미지를 클릭했습니다!');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

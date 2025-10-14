@@ -1,0 +1,103 @@
+{
+  "name": "Design System MCP",
+  "description": "Transform Figma designs into React/Vue components using your existing design system",
+  "version": "1.0.0",
+  "author": "Jongho",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/design-system-mcp.git"
+  },
+  "homepage": "https://github.com/your-username/design-system-mcp#readme",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "design-system",
+    "figma",
+    "react",
+    "vue",
+    "cursor",
+    "ai",
+    "code-generation",
+    "component-library"
+  ],
+  "category": "Design & Development",
+  "tags": ["figma", "react", "vue", "design-system", "mcp", "ai"],
+  "features": [
+    "Figma Integration",
+    "React Code Generation", 
+    "Vue Code Generation",
+    "Smart Component Mapping",
+    "Design Analysis",
+    "Cursor AI Integration"
+  ],
+  "requirements": {
+    "node": ">=18.0.0",
+    "figma_token": "required"
+  },
+  "installation": {
+    "command": "npm install design-system-mcp",
+    "setup": [
+      "Get Figma Access Token from Figma → Settings → Account → Personal Access Tokens",
+      "Set environment variable: export FIGMA_ACCESS_TOKEN='your_token_here'",
+      "Configure Cursor AI MCP settings"
+    ]
+  },
+  "usage": {
+    "examples": [
+      "<FigmaURL>을 React 컴포넌트로 변환해줘",
+      "<FigmaURL>을 Vue 컴포넌트로 변환해줘"
+    ],
+    "tools": [
+      {
+        "name": "convert_figma_to_react",
+        "description": "Convert Figma designs to React components",
+        "parameters": ["figmaUrl", "componentName", "nodeId (optional)"]
+      },
+      {
+        "name": "convert_figma_to_vue", 
+        "description": "Convert Figma designs to Vue components",
+        "parameters": ["figmaUrl", "componentName", "nodeId (optional)"]
+      },
+      {
+        "name": "list_design_system_components",
+        "description": "List available design system components",
+        "parameters": ["framework"]
+      },
+      {
+        "name": "analyze_figma_file",
+        "description": "Analyze Figma file structure and suggest mappings",
+        "parameters": ["figmaUrl"]
+      }
+    ]
+  },
+  "supported_design_systems": [
+    {
+      "name": "React Design System",
+      "url": "https://github.com/dealicious-inc/ssm-web/tree/master/packages/design-system-react",
+      "components": ["Button", "Input", "Card", "Modal", "Table"]
+    },
+    {
+      "name": "Vue Design System", 
+      "url": "https://github.com/dealicious-inc/ssm-web/tree/master/packages/design-system",
+      "components": ["Button", "Input", "Card"]
+    }
+  ],
+  "cursor_config": {
+    "mcpServers": {
+      "design-system-mcp": {
+        "command": "npx",
+        "args": ["design-system-mcp"],
+        "env": {
+          "FIGMA_ACCESS_TOKEN": "your_figma_token_here"
+        }
+      }
+    }
+  },
+  "documentation": {
+    "readme": "SMITHERY_README.md",
+    "quick_start": "QUICK_START.md",
+    "usage": "USAGE.md",
+    "installation": "INSTALLATION.md"
+  }
+}
