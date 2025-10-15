@@ -29,8 +29,8 @@ setup.bat
 ### 수동 설치
 
 ```bash
-npm install
-npm run build
+yarn install
+yarn build
 ```
 
 ## 환경 설정
@@ -56,7 +56,7 @@ FIGMA_ACCESS_TOKEN=your_figma_access_token_here
 ### MCP 서버 실행
 
 ```bash
-npm start
+yarn start
 ```
 
 ### 사용 가능한 도구
@@ -143,13 +143,13 @@ src/
 
 ```bash
 # 개발 모드 실행
-npm run dev
+yarn dev
 
 # 빌드
-npm run build
+yarn build
 
 # 테스트
-npm test
+yarn test
 ```
 
 ## 라이선스

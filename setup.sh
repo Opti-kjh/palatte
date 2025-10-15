@@ -39,8 +39,8 @@ if ! command -v node &> /dev/null; then
     exit 1
 fi
 
-if ! command -v npm &> /dev/null; then
-    print_error "npm이 설치되어 있지 않습니다."
+if ! command -v yarn &> /dev/null; then
+    print_error "yarn이 설치되어 있지 않습니다. yarn을 설치해주세요."
     exit 1
 fi
 
@@ -54,12 +54,12 @@ print_success "Node.js $(node --version) 확인됨"
 
 # 2. 프로젝트 의존성 설치
 print_step "프로젝트 의존성 설치 중..."
-npm install
+yarn install
 print_success "의존성 설치 완료"
 
 # 3. 빌드
 print_step "프로젝트 빌드 중..."
-npm run build
+yarn build
 print_success "빌드 완료"
 
 # 4. 환경 변수 설정
@@ -136,7 +136,7 @@ fi
 
 # 6. 테스트 실행
 print_step "MCP 서버 테스트 중..."
-if npm run mcp --version &> /dev/null; then
+if yarn mcp --version &> /dev/null; then
     print_success "MCP 서버가 정상적으로 실행됩니다."
 else
     print_warning "MCP 서버 테스트에 실패했습니다. 수동으로 확인해주세요."

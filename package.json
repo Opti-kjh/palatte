@@ -20,8 +20,8 @@
     "test:services": "tsx src/test.ts",
     "mcp": "node dist/index.js",
     "mcp:dev": "tsx src/index.ts",
-    "postinstall": "npm run build",
-    "prepublishOnly": "npm run build"
+    "postinstall": "yarn build",
+    "prepublishOnly": "yarn build"
   },
   "keywords": [
     "mcp",

@@ -12,10 +12,10 @@ git clone <repository-url>
 cd palette
 
 # 의존성 설치 및 빌드
-npm install
+yarn install
 
 # 전역 설치 (선택사항)
-npm link
+yarn link
 ```
 
 ### 방법 2: npx로 직접 사용
@@ -26,7 +26,7 @@ git clone <repository-url>
 cd palette
 
 # 의존성 설치 및 빌드
-npm install
+yarn install
 ```
 
 ## 2. 환경 변수 설정
@@ -133,7 +133,7 @@ https://www.figma.com/file/your-file-id/your-design을 React 컴포넌트로 변
 
 - Cursor IDE를 완전히 재시작
 - 환경 변수가 올바르게 설정되었는지 확인
-- 프로젝트가 올바르게 빌드되었는지 확인 (`npm run build`)
+- 프로젝트가 올바르게 빌드되었는지 확인 (`yarn build`)
 
 ### 2. Figma API 오류
 
@@ -153,7 +153,7 @@ https://www.figma.com/file/your-file-id/your-design을 React 컴포넌트로 변
 # 팀원들이 클론할 수 있도록 저장소 공유
 git clone <repository-url>
 cd palette
-npm install
+yarn install
 ```
 
 ### 2. npm 패키지로 배포 (고급)
@@ -163,7 +163,7 @@ npm install
 npm publish
 
 # 팀원들이 설치
-npm install -g palette
+yarn global add palette
 ```
 
 ### 3. Docker 사용 (고급)
@@ -172,7 +172,7 @@ npm install -g palette
 FROM node:18
 WORKDIR /app
 COPY . .
-RUN npm install && npm run build
+RUN yarn install && yarn build
 CMD ["node", "dist/index.js"]
 ```
 
@@ -186,8 +186,8 @@ CMD ["node", "dist/index.js"]
 {
   "mcpServers": {
     "palette": {
-      "command": "npm",
-      "args": ["run", "mcp:dev"],
+      "command": "yarn",
+      "args": ["mcp:dev"],
       "cwd": "/path/to/palette",
       "env": {
         "FIGMA_ACCESS_TOKEN": "${FIGMA_ACCESS_TOKEN}"

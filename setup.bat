@@ -16,18 +16,18 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-where npm >nul 2>nul
+where yarn >nul 2>nul
 if %errorlevel% neq 0 (
-    echo ❌ npm이 설치되어 있지 않습니다.
+    echo ❌ yarn이 설치되어 있지 않습니다. yarn을 설치해주세요.
     pause
     exit /b 1
 )
 
-echo ✅ Node.js 및 npm 확인됨
+echo ✅ Node.js 및 yarn 확인됨
 
 REM 2. 프로젝트 의존성 설치
 echo 📋 프로젝트 의존성 설치 중...
-call npm install
+call yarn install
 if %errorlevel% neq 0 (
     echo ❌ 의존성 설치에 실패했습니다.
     pause
@@ -37,7 +37,7 @@ echo ✅ 의존성 설치 완료
 
 REM 3. 빌드
 echo 📋 프로젝트 빌드 중...
-call npm run build
+call yarn build
 if %errorlevel% neq 0 (
     echo ❌ 빌드에 실패했습니다.
     pause

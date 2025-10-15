@@ -4,7 +4,7 @@
 
 ### 1. 의존성 설치
 ```bash
-npm install
+yarn install
 ```
 
 ### 2. 환경 변수 설정
@@ -16,7 +16,7 @@ FIGMA_ACCESS_TOKEN=your_figma_access_token_here
 
 ### 3. 빌드
 ```bash
-npm run build
+yarn build
 ```
 
 ## Cursor AI에서 사용하기
@@ -172,18 +172,18 @@ import { Card } from 'design-system/Card';
 
 ### 3. 빌드 오류
 - TypeScript 버전을 확인합니다.
-- `npm run build` 명령어를 실행합니다.
+- `yarn build` 명령어를 실행합니다.
 
 ## 개발 및 디버깅
 
 ### 서비스 테스트
 ```bash
-npm run test:services
+yarn test:services
 ```
 
 ### 개발 모드 실행
 ```bash
-npm run dev
+yarn dev
 ```
 
 ### 로그 확인

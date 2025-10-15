@@ -120,7 +120,7 @@ import Card from '@dealicious/design-system/src/components/ssm-card';
 
 1. Cursor IDE를 완전히 재시작
 2. 환경 변수 확인: `echo $FIGMA_ACCESS_TOKEN` (macOS/Linux) 또는 `echo %FIGMA_ACCESS_TOKEN%` (Windows)
-3. 프로젝트 빌드 확인: `npm run build`
+3. 프로젝트 빌드 확인: `yarn build`
 
 ### Figma API 오류
 
