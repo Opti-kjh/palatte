@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { FigmaMCPClient } from '../utils/figma-mcp-client.js';
 
 export interface FigmaNode {
   id: string;
@@ -84,9 +85,18 @@ export interface FigmaAnalysis {
 export class FigmaService {
   private accessToken: string;
   private baseUrl = 'https://api.figma.com/v1';
+  private mcpClient: FigmaMCPClient | null = null;
+  private useMCP: boolean;
 
-  constructor() {
+  constructor(useMCP: boolean = true, mcpBaseUrl?: string) {
     this.accessToken = process.env.FIGMA_ACCESS_TOKEN || '';
+    this.useMCP = useMCP;
+    
+    if (useMCP) {
+      const mcpUrl = mcpBaseUrl || process.env.FIGMA_MCP_SERVER_URL || 'http://127.0.0.1:3845/mcp';
+      this.mcpClient = new FigmaMCPClient(mcpUrl);
+    }
+    
     if (!this.accessToken) {
       console.warn('환경 변수에서 FIGMA_ACCESS_TOKEN을 찾을 수 없습니다.');
     }
@@ -96,7 +106,8 @@ export class FigmaService {
    * Figma URL에서 파일 ID 추출
    */
   private extractFileId(url: string): string {
-    const match = url.match(/\/file\/([a-zA-Z0-9]+)/);
+    // /file/ 또는 /design/ 경로에서 파일 ID 추출
+    const match = url.match(/\/(?:file|design)\/([a-zA-Z0-9]+)/);
     if (match) {
       return match[1];
     }
@@ -108,13 +119,98 @@ export class FigmaService {
   }
 
   /**
+   * Figma URL에서 node-id 추출
+   */
+  extractNodeId(url: string): string | undefined {
+    const match = url.match(/[?&]node-id=([^&]+)/);
+    if (match) {
+      // node-id는 URL 인코딩되어 있을 수 있으므로 디코딩
+      return decodeURIComponent(match[1]);
+    }
+    return undefined;
+  }
+
+  /**
+   * MCP 응답을 FigmaFile 형식으로 변환
+   */
+  private transformMCPResponseToFigmaFile(mcpData: any): FigmaFile {
+    // MCP 응답 형식에 따라 변환 로직 구현
+    // Figma MCP 서버의 응답 구조에 맞게 조정 필요
+    if (!mcpData) {
+      throw new Error('MCP 응답 데이터가 없습니다.');
+    }
+
+    // MCP 응답이 이미 FigmaFile 형식인 경우
+    if (mcpData.document) {
+      return {
+        document: mcpData.document,
+        components: mcpData.components || {},
+        styles: mcpData.styles || {},
+        name: mcpData.name || 'Untitled',
+        lastModified: mcpData.lastModified || new Date().toISOString(),
+        thumbnailUrl: mcpData.thumbnailUrl || '',
+      };
+    }
+
+    // MCP 응답이 다른 형식인 경우 변환
+    // content 배열에서 데이터 추출 (MCP 도구 응답 형식)
+    if (mcpData.content && Array.isArray(mcpData.content)) {
+      const textContent = mcpData.content.find((c: any) => c.type === 'text');
+      if (textContent) {
+        try {
+          const parsed = JSON.parse(textContent.text);
+          return this.transformMCPResponseToFigmaFile(parsed);
+        } catch {
+          // JSON이 아닌 경우 처리
+        }
+      }
+    }
+
+    // 기본 구조로 변환 시도
+    return {
+      document: mcpData.document || mcpData.node || { id: 'root', name: 'Document', type: 'DOCUMENT', children: [] },
+      components: mcpData.components || {},
+      styles: mcpData.styles || {},
+      name: mcpData.name || 'Untitled',
+      lastModified: mcpData.lastModified || new Date().toISOString(),
+      thumbnailUrl: mcpData.thumbnailUrl || '',
+    };
+  }
+
+  /**
    * Figma 파일 데이터 가져오기
+   * MCP 서버를 우선 사용하고, 실패 시 기존 REST API로 폴백
    */
   async getFigmaData(url: string, nodeId?: string): Promise<FigmaFile> {
     const fileId = this.extractFileId(url);
     
+    // MCP 클라이언트 사용 시도
+    if (this.useMCP && this.mcpClient !== null) {
+      try {
+        const isAvailable = await this.mcpClient.isAvailable();
+        if (isAvailable) {
+          const mcpData = nodeId
+            ? await this.mcpClient.getNodeData(fileId, nodeId)
+            : await this.mcpClient.getFileData(fileId, nodeId);
+          
+          if (mcpData) {
+            try {
+              return this.transformMCPResponseToFigmaFile(mcpData);
+            } catch (error) {
+              console.warn('MCP 응답 변환 실패, REST API로 폴백:', error);
+              // 폴백으로 REST API 사용
+            }
+          }
+        }
+      } catch (error) {
+        console.warn('Figma MCP 서버 연결 실패, REST API로 폴백:', error);
+        // 폴백으로 REST API 사용
+      }
+    }
+
+    // REST API 폴백
     if (!this.accessToken) {
-      throw new Error('Figma 액세스 토큰이 필요합니다.');
+      throw new Error('Figma 액세스 토큰이 필요합니다. MCP 서버도 사용할 수 없습니다.');
     }
 
     try {

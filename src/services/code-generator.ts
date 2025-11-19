@@ -230,6 +230,28 @@ export class CodeGenerator {
       border: 2px dashed #dee2e6;
       border-radius: 4px;
       background: #fff;
+      min-height: 200px;
+    }
+    .error {
+      color: red;
+      padding: 10px;
+      background: #ffe6e6;
+      border: 1px solid #ff9999;
+      border-radius: 4px;
+      margin: 10px 0;
+    }
+    .mock-button {
+      display: inline-block;
+      padding: 8px 16px;
+      margin: 4px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .mock-button:hover {
+      background: #0056b3;
     }
   </style>
 </head>
@@ -241,16 +263,120 @@ export class CodeGenerator {
     </div>
   </div>
   <script type="text/babel">
-    // 모의 Design System 컴포넌트는 여기에 추가됩니다
-    // 실제 Design System 패키지 설치가 필요합니다
+    // 모의 Design System 컴포넌트 정의
+    const Button = ({ children, size, ...props }) => {
+      const sizeStyle = size === 'small' ? { padding: '4px 8px', fontSize: '12px' } : 
+                       size === 'large' ? { padding: '12px 24px', fontSize: '16px' } : 
+                       { padding: '8px 16px', fontSize: '14px' };
+      return React.createElement('button', {
+        style: { ...sizeStyle, background: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', margin: '2px' },
+        ...props
+      }, children);
+    };
     
+    const LayerPopup = ({ children, isOpen, onClose, ...props }) => {
+      if (!isOpen) return null;
+      return React.createElement('div', {
+        style: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' },
+        onClick: onClose,
+        ...props
+      }, React.createElement('div', {
+        style: { background: 'white', padding: '20px', borderRadius: '8px', maxWidth: '90%', maxHeight: '90%', overflow: 'auto' },
+        onClick: (e) => e.stopPropagation()
+      }, children));
+    };
+    
+    const Tab = ({ children, tabs, activeTab, onTabChange, ...props }) => {
+      return React.createElement('div', { style: { borderBottom: '1px solid #ddd' }, ...props }, children);
+    };
+    
+    const Text = ({ children, variant, size, ...props }) => {
+      const style = {
+        fontSize: size === 'small' ? '12px' : size === 'large' ? '18px' : '14px',
+        fontWeight: variant === 'heading' ? 'bold' : 'normal',
+        ...props.style
+      };
+      return React.createElement('span', { style, ...props }, children);
+    };
+    
+    const LabeledText = ({ label, value, ...props }) => {
+      return React.createElement('div', { style: { margin: '4px 0' }, ...props },
+        React.createElement('span', { style: { fontWeight: 'bold', marginRight: '8px' } }, label + ':'),
+        React.createElement('span', {}, value || '')
+      );
+    };
+    
+    const Input = ({ placeholder, value, onChange, ...props }) => {
+      return React.createElement('input', {
+        type: 'text',
+        placeholder,
+        value: value || '',
+        onChange: onChange || (() => {}),
+        style: { padding: '8px', border: '1px solid #ddd', borderRadius: '4px', margin: '4px', width: '200px' },
+        ...props
+      });
+    };
+    
+    const Chip = ({ children, variant, size, onDelete, ...props }) => {
+      return React.createElement('span', {
+        style: {
+          display: 'inline-block',
+          padding: '4px 8px',
+          background: variant === 'filled' ? '#007bff' : '#f0f0f0',
+          color: variant === 'filled' ? 'white' : 'black',
+          borderRadius: '16px',
+          margin: '2px',
+          fontSize: size === 'small' ? '12px' : '14px'
+        },
+        ...props
+      }, children, onDelete && React.createElement('button', {
+        onClick: onDelete,
+        style: { marginLeft: '8px', background: 'none', border: 'none', cursor: 'pointer' }
+      }, '×'));
+    };
+    
+    const Switch = ({ checked, onChange, label, ...props }) => {
+      return React.createElement('label', { style: { display: 'flex', alignItems: 'center', margin: '4px' }, ...props },
+        React.createElement('input', {
+          type: 'checkbox',
+          checked: checked || false,
+          onChange: onChange || (() => {}),
+          style: { marginRight: '8px' }
+        }),
+        label && React.createElement('span', {}, label)
+      );
+    };
+    
+    const ArrowPagination = ({ currentPage, totalPages, onPageChange, children, ...props }) => {
+      return React.createElement('div', { style: { display: 'flex', alignItems: 'center', margin: '4px' }, ...props }, children);
+    };
+    
+    const Accordion = ({ title, children, defaultExpanded, disabled, ...props }) => {
+      const [expanded, setExpanded] = React.useState(defaultExpanded || false);
+      if (disabled) return null;
+      return React.createElement('div', { style: { border: '1px solid #ddd', borderRadius: '4px', margin: '4px' }, ...props },
+        React.createElement('div', {
+          onClick: () => setExpanded(!expanded),
+          style: { padding: '8px', cursor: 'pointer', background: '#f5f5f5', fontWeight: 'bold' }
+        }, title || 'Accordion'),
+        expanded && React.createElement('div', { style: { padding: '8px' } }, children)
+      );
+    };
+    
+    // 컴포넌트 코드 정리
     const cleanCode = ${JSON.stringify(componentCode)}
       .replace(/import[^;]+;/g, '')
       .replace(/\/\/[^\\n]*/g, '')
       .replace(/interface[^\\{]*\\{[^\\}]*\\}/g, '')
       .replace(/React\\.FC<[^>]*>/g, '')
       .replace(/export default ${componentName};/g, '')
-      .replace(new RegExp(\`const ${componentName}:.*?=\`, 'g'), \`const ${componentName} = \`);
+      .replace(new RegExp(\`const ${componentName}:.*?=\`, 'g'), \`const ${componentName} = \`)
+      // 문법 오류 수정: 잘못된 prop 형식 수정
+      .replace(/<Button\\s+>([^<]+)\\s+size="([^"]+)">/g, '<Button size="$2">$1</Button>')
+      .replace(/<Button\\s+>([^<]+)\\s+size="([^"]+)">/g, '<Button size="$2">$1</Button>')
+      // 빈 Button 태그 정리
+      .replace(/<Button\\s*><\\/Button>/g, '<Button></Button>')
+      .replace(/<Button\\s+size="([^"]+)"\\s*><\\/Button>/g, '<Button size="$1"></Button>');
     
     try {
       const transformedCode = Babel.transform(cleanCode, { presets: ['react'] }).code;
@@ -258,7 +384,11 @@ export class CodeGenerator {
       const root = ReactDOM.createRoot(document.getElementById('root'));
       root.render(React.createElement(${componentName}, {}));
     } catch (error) {
-      document.getElementById('root').innerHTML = '<p style="color: red;">렌더링 오류: ' + error.message + '</p>';
+      console.error('렌더링 오류:', error);
+      const errorDiv = document.getElementById('root');
+      errorDiv.innerHTML = '<div class="error"><strong>렌더링 오류:</strong><br>' + 
+        error.message + '<br><br><strong>스택:</strong><br>' + 
+        (error.stack || '스택 정보 없음') + '</div>';
     }
   </script>
 </body>
@@ -324,9 +454,9 @@ export class CodeGenerator {
   } {
     // 보이지 않는 노드 건너뛰기
     if (node.visible === false) {
-      const defaultComponent = this.designSystemService.getComponent('Card', framework);
+      const defaultComponent = this.designSystemService.getComponent('Button', framework);
       if (!defaultComponent) {
-        // Card는 항상 사용 가능하므로 이 경우는 절대 발생하지 않음
+        // Button은 항상 사용 가능하므로 이 경우는 절대 발생하지 않음
         throw new Error('No Design System components available');
       }
       return {
@@ -344,16 +474,30 @@ export class CodeGenerator {
       component = this.getDefaultComponentByType(node, framework);
     }
     
+    // component가 null인 경우 (컨테이너 역할만 하는 경우) div로 처리하기 위해 특별한 컴포넌트 사용
+    // 실제로는 generateReactJSX에서 null 체크하여 div로 처리
+    if (!component) {
+      // div로 처리하기 위한 플레이스홀더 컴포넌트 생성
+      component = {
+        name: 'div',
+        description: 'Container div',
+        category: 'Layout',
+        importPath: '',
+        props: [],
+        examples: [],
+      } as DesignSystemComponent;
+    }
+    
     return {
       figmaNode: node,
       designSystemComponent: component,
-      confidence: 0.8,
+      confidence: component.name === 'div' ? 0.5 : 0.8,
     };
   }
 
   /**
    * Figma 노드 속성에 따라 디자인 시스템 컴포넌트 찾기
-   * 일반적인 패턴 기반 유사 매칭
+   * 노드 타입, 이름, 구조, 속성을 종합적으로 분석하여 적절한 컴포넌트 매핑
    */
   private findComponentByNodeProperties(
     node: FigmaNode,
@@ -362,87 +506,183 @@ export class CodeGenerator {
     const nodeName = node.name.toLowerCase();
     const nodeType = node.type;
 
-    // 1. 직접 이름 매칭
+    // 1. 직접 이름 매칭 (가장 정확한 매칭)
     let component = this.designSystemService.findBestMatch(nodeName, framework);
     if (component) return component;
 
-    // 2. 일반적인 패턴 기반 유사 매칭
-    const enhancedMappings = [
-      { patterns: ['btn', 'button', 'click', 'submit', 'action'], component: 'Button' },
-      { patterns: ['input', 'field', 'text', 'search', 'email'], component: 'Input' },
-      { patterns: ['card', 'panel', 'container', 'box', 'wrapper'], component: 'Card' },
-      { patterns: ['modal', 'dialog', 'popup', 'overlay'], component: 'Modal' },
-      { patterns: ['table', 'grid', 'list', 'data'], component: 'Table' },
-    ];
-
-    for (const mapping of enhancedMappings) {
-      if (mapping.patterns.some(pattern => nodeName.includes(pattern))) {
-        const foundComponent = this.designSystemService.getComponent(mapping.component, framework);
-        if (foundComponent) return foundComponent;
-      }
-    }
-
-    // 3. 타입 기반 매칭
+    // 2. 노드 타입과 구조 기반 매칭
     switch (nodeType) {
       case 'TEXT':
-        // Text 노드 - 버튼 레이블인지 확인
-        if (nodeName.includes('button') || nodeName.includes('btn') || nodeName.includes('click')) {
+        // TEXT 노드는 Text 컴포넌트 사용
+        // 단, 버튼 레이블로 사용되는 경우는 제외
+        if (this.isButtonLabel(node)) {
           return this.designSystemService.getComponent('Button', framework);
         }
-        // 기본 텍스트로 Card 사용
-        return this.designSystemService.getComponent('Card', framework);
+        // 링크 텍스트인지 확인
+        if (nodeName.includes('link') || nodeName.includes('href') || this.hasLinkParent(node)) {
+          return this.designSystemService.getComponent('TextLink', framework);
+        }
+        // 기본 텍스트는 Text 컴포넌트 사용
+        return this.designSystemService.getComponent('Text', framework);
         
       case 'FRAME':
-        // Frames - 일반적인 패턴 기반 유사 매칭
-        if (nodeName.includes('card') || nodeName.includes('panel') || nodeName.includes('container')) {
-          return this.designSystemService.getComponent('Card', framework);
-        }
-        if (nodeName.includes('modal') || nodeName.includes('dialog') || nodeName.includes('popup')) {
-          return this.designSystemService.getComponent('Modal', framework);
-        }
-        // 기본 프레임으로 Card 사용
-        return this.designSystemService.getComponent('Card', framework);
+        // FRAME 노드는 자식 구조를 분석하여 적절한 컴포넌트 선택
+        return this.analyzeFrameNode(node, framework);
         
       case 'COMPONENT':
-        // Component 인스턴스 - 일반적인 패턴 기반 유사 매칭
+        // Component 인스턴스 - 이름 기반 매칭
         component = this.designSystemService.findBestMatch(nodeName, framework);
         if (component) return component;
-        // 기본 컴포넌트로 Card 사용
-        return this.designSystemService.getComponent('Card', framework);
+        // 컴포넌트 인스턴스는 자식 구조 분석
+        return this.analyzeFrameNode(node, framework);
         
       case 'RECTANGLE':
-        // Rectangles - 일반적인 패턴 기반 유사 매칭
+        // RECTANGLE 노드는 이름과 자식 구조 분석
         if (nodeName.includes('button') || nodeName.includes('btn') || nodeName.includes('click')) {
           return this.designSystemService.getComponent('Button', framework);
         }
-        if (nodeName.includes('input') || nodeName.includes('field') || nodeName.includes('text')) {
+        if (nodeName.includes('input') || nodeName.includes('field')) {
           return this.designSystemService.getComponent('Input', framework);
         }
-        if (nodeName.includes('card') || nodeName.includes('panel') || nodeName.includes('container')) {
-          return this.designSystemService.getComponent('Card', framework);
+        if (nodeName.includes('badge') || nodeName.includes('tag') || nodeName.includes('label')) {
+          const badgeComponent = this.designSystemService.getComponent('Badge', framework);
+          if (badgeComponent) return badgeComponent;
+          return this.designSystemService.getComponent('Tag', framework);
         }
-        // 기본 사각형으로 Button 사용 (가장 일반적인 상호 작용 요소)
-        return this.designSystemService.getComponent('Button', framework);
+        if (nodeName.includes('chip')) {
+          return this.designSystemService.getComponent('Chip', framework);
+        }
+        // 사각형은 자식 구조 분석
+        return this.analyzeFrameNode(node, framework);
+        
+      case 'GROUP':
+        // GROUP은 컨테이너 역할만 하므로 자식 구조 분석
+        return this.analyzeFrameNode(node, framework);
         
       default:
-        // 기본 폴백으로 Card 사용
-        return this.designSystemService.getComponent('Card', framework);
+        // 알 수 없는 타입은 자식 구조 분석
+        return this.analyzeFrameNode(node, framework);
     }
+  }
+
+  /**
+   * FRAME 노드 분석 - 자식 구조를 기반으로 적절한 컴포넌트 선택
+   */
+  private analyzeFrameNode(
+    node: FigmaNode,
+    framework: 'react' | 'vue'
+  ): DesignSystemComponent | null {
+    const nodeName = node.name.toLowerCase();
+    
+    // 이름 기반 매칭 (우선순위 높음)
+    if (nodeName.includes('tab') || nodeName.includes('tabs')) {
+      return this.designSystemService.getComponent('Tab', framework);
+    }
+    if (nodeName.includes('accordion') || nodeName.includes('collapse')) {
+      return this.designSystemService.getComponent('Accordion', framework);
+    }
+    if (nodeName.includes('modal') || nodeName.includes('dialog') || nodeName.includes('popup')) {
+      return this.designSystemService.getComponent('Modal', framework);
+    }
+    if (nodeName.includes('button') || nodeName.includes('btn')) {
+      return this.designSystemService.getComponent('Button', framework);
+    }
+    if (nodeName.includes('badge')) {
+      return this.designSystemService.getComponent('Badge', framework);
+    }
+    if (nodeName.includes('tag')) {
+      return this.designSystemService.getComponent('Tag', framework);
+    }
+    if (nodeName.includes('chip')) {
+      return this.designSystemService.getComponent('Chip', framework);
+    }
+    if (nodeName.includes('labeled') || nodeName.includes('label-text')) {
+      return this.designSystemService.getComponent('LabeledText', framework);
+    }
+    if (nodeName.includes('text-link') || nodeName.includes('link')) {
+      return this.designSystemService.getComponent('TextLink', framework);
+    }
+    
+    // 자식 노드 구조 분석
+    if (node.children && node.children.length > 0) {
+      // 자식이 모두 TEXT인 경우 - Text 또는 LabeledText
+      const allTextChildren = node.children.every(child => child.type === 'TEXT');
+      if (allTextChildren && node.children.length === 1) {
+        return this.designSystemService.getComponent('Text', framework);
+      }
+      if (allTextChildren && node.children.length === 2) {
+        // 라벨과 값이 있는 경우 LabeledText
+        return this.designSystemService.getComponent('LabeledText', framework);
+      }
+      
+      // 자식에 Tab이 있는 경우 - Tab 컴포넌트
+      const hasTabChildren = node.children.some(child => 
+        child.name.toLowerCase().includes('tab') || 
+        child.type === 'COMPONENT' && child.name.toLowerCase().includes('tab')
+      );
+      if (hasTabChildren) {
+        return this.designSystemService.getComponent('Tab', framework);
+      }
+      
+      // 자식에 Accordion이 있는 경우
+      const hasAccordionChildren = node.children.some(child => 
+        child.name.toLowerCase().includes('accordion') || 
+        child.type === 'COMPONENT' && child.name.toLowerCase().includes('accordion')
+      );
+      if (hasAccordionChildren) {
+        return this.designSystemService.getComponent('Accordion', framework);
+      }
+      
+      // 레이아웃 모드가 있는 경우 (Auto Layout)
+      if (node.layoutMode === 'HORIZONTAL' || node.layoutMode === 'VERTICAL') {
+        // Auto Layout은 일반적으로 컨테이너 역할
+        // 자식이 버튼인 경우 Button 그룹으로 처리하지 않고 div로 처리
+        return null; // null을 반환하면 div로 처리
+      }
+    }
+    
+    // 기본적으로 컨테이너 역할만 하는 경우 null 반환 (div로 처리)
+    return null;
+  }
+
+  /**
+   * 노드가 버튼 레이블인지 확인
+   */
+  private isButtonLabel(node: FigmaNode): boolean {
+    // 부모 노드가 버튼인지 확인하는 로직은 현재 노드 구조로는 어려움
+    // 이름 기반으로 판단
+    const nodeName = node.name.toLowerCase();
+    return nodeName.includes('button') || nodeName.includes('btn') || nodeName.includes('click');
+  }
+
+  /**
+   * 노드가 링크의 일부인지 확인
+   */
+  private hasLinkParent(node: FigmaNode): boolean {
+    // 현재 구현에서는 이름 기반으로 판단
+    const nodeName = node.name.toLowerCase();
+    return nodeName.includes('link') || nodeName.includes('href');
   }
 
   /**
    * 기본 디자인 시스템 컴포넌트 가져오기
    */
   private async getDefaultComponent(framework: 'react' | 'vue'): Promise<DesignSystemComponent> {
-    const cardComponent = this.designSystemService.getComponent('Card', framework);
-    if (cardComponent) return cardComponent;
+    // Button을 기본 컴포넌트로 사용 (항상 존재함)
+    const buttonComponent = this.designSystemService.getComponent('Button', framework);
+    if (buttonComponent) return buttonComponent;
     
+    // Button이 없으면 첫 번째 사용 가능한 컴포넌트 사용
     const components = await this.designSystemService.getAvailableComponents(framework);
+    if (components.length === 0) {
+      throw new Error('No Design System components available');
+    }
     return components[0];
   }
 
   /**
    * 노드 유형에 따라 기본 컴포넌트 가져오기
+   * findComponentByNodeProperties에서 매칭되지 않은 경우에만 사용
    */
   private getDefaultComponentByType(node: FigmaNode, framework: 'react' | 'vue'): DesignSystemComponent {
     const nodeType = node.type;
@@ -451,47 +691,47 @@ export class CodeGenerator {
     // 노드 유형과 이름에 따라 스마트 기본값
     switch (nodeType) {
       case 'TEXT':
-        if (nodeName.includes('button') || nodeName.includes('btn') || nodeName.includes('click')) {
-          const buttonComponent = this.designSystemService.getComponent('Button', framework);
-          if (buttonComponent) return buttonComponent;
-        }
-        const cardComponent = this.designSystemService.getComponent('Card', framework);
-        if (cardComponent) return cardComponent;
+        // Text 노드는 Text 컴포넌트 사용
+        const textComponent = this.designSystemService.getComponent('Text', framework);
+        if (textComponent) return textComponent;
         break;
         
       case 'RECTANGLE':
-        if (nodeName.includes('input') || nodeName.includes('field')) {
-          const inputComponent = this.designSystemService.getComponent('Input', framework);
-          if (inputComponent) return inputComponent;
-        }
+        // Rectangle은 이름 기반으로 판단
         if (nodeName.includes('button') || nodeName.includes('btn')) {
           const buttonComponent = this.designSystemService.getComponent('Button', framework);
           if (buttonComponent) return buttonComponent;
         }
-        const buttonComponent2 = this.designSystemService.getComponent('Button', framework);
-        if (buttonComponent2) return buttonComponent2;
+        if (nodeName.includes('badge') || nodeName.includes('tag')) {
+          const badgeComponent = this.designSystemService.getComponent('Badge', framework);
+          if (badgeComponent) return badgeComponent;
+        }
+        // 기본적으로 div로 처리 (null 반환하면 div 사용)
         break;
         
       case 'FRAME':
-        if (nodeName.includes('modal') || nodeName.includes('dialog')) {
-          const modalComponent = this.designSystemService.getComponent('Modal', framework);
-          if (modalComponent) return modalComponent;
-        }
-        const cardComponent2 = this.designSystemService.getComponent('Card', framework);
-        if (cardComponent2) return cardComponent2;
+      case 'GROUP':
+        // Frame과 Group은 컨테이너 역할만 하므로 div 사용 (null 반환)
         break;
         
       default:
-        const defaultCardComponent = this.designSystemService.getComponent('Card', framework);
-        if (defaultCardComponent) return defaultCardComponent;
+        // 알 수 없는 타입은 div 사용
         break;
     }
     
-    // 최종 폴백 - Card를 마지막 수단으로 사용
-    const finalCardComponent = this.designSystemService.getComponent('Card', framework);
-    if (finalCardComponent) return finalCardComponent;
+    // 최종 폴백 - Button 사용 (최후의 수단)
+    const finalButtonComponent = this.designSystemService.getComponent('Button', framework);
+    if (finalButtonComponent) return finalButtonComponent;
     
-    // Card는 항상 사용 가능하므로 이 경우는 절대 발생하지 않음
+    // Button이 없으면 첫 번째 사용 가능한 컴포넌트 사용
+    const components = framework === 'react' 
+      ? this.designSystemService['reactComponents'] 
+      : this.designSystemService['vueComponents'];
+    
+    if (components && components.length > 0) {
+      return components[0];
+    }
+    
     throw new Error('No Design System components available');
   }
 
@@ -515,7 +755,7 @@ export class CodeGenerator {
     
     code += `const ${componentName}: React.FC<${componentName}Props> = (props) => {\n`;
     code += `  return (\n`;
-    code += `    <div className="${this.generateClassName(rootNode)}">\n`;
+    code += `    <div>\n`;
     
     // 매핑된 컴포넌트에 따라 JSX 생성
     code += this.generateReactJSX(rootNode, mappedComponents, 2);
@@ -541,7 +781,7 @@ export class CodeGenerator {
     }>
   ): string {
     let code = `<template>\n`;
-    code += `  <div class="${this.generateClassName(rootNode)}">\n`;
+    code += `  <div>\n`;
     
     // 매핑된 컴포넌트에 따라 템플릿 생성
     code += this.generateVueTemplate(rootNode, mappedComponents, 2);
@@ -554,9 +794,7 @@ export class CodeGenerator {
     code += `</script>\n\n`;
     
     code += `<style scoped>\n`;
-    code += `.${this.generateClassName(rootNode)} {\n`;
-    code += `  /* Add your styles here */\n`;
-    code += `}\n`;
+    code += `/* Add your styles here */\n`;
     code += `</style>\n`;
     
     return code;
@@ -564,6 +802,7 @@ export class CodeGenerator {
 
   /**
    * Figma 노드에서 React JSX 생성
+   * 불필요한 중첩을 제거하여 깊이를 최소화
    */
   private generateReactJSX(
     node: FigmaNode,
@@ -572,49 +811,241 @@ export class CodeGenerator {
       designSystemComponent: DesignSystemComponent;
       confidence: number;
     }>,
-    indent: number = 0
+    indent: number = 0,
+    parentComponent?: DesignSystemComponent
   ): string {
     const indentStr = '  '.repeat(indent);
     let jsx = '';
 
+    // 보이지 않는 노드는 건너뛰기
+    if (node.visible === false) {
+      return '';
+    }
+
     // 현재 노드에 대한 매핑 찾기
     const mapping = mappedComponents.find(m => m.figmaNode.id === node.id);
     
-    // 항상 디자인 시스템 컴포넌트 사용 - HTML로 폴백하지 않음
     if (mapping?.designSystemComponent) {
       const component = mapping.designSystemComponent;
-      const props = this.generateComponentProps(node, component);
-      jsx += `${indentStr}<${component.name}${props}>\n`;
       
-      if (node.children) {
-        for (const child of node.children) {
-          jsx += this.generateReactJSX(child, mappedComponents, indent + 1);
+      // 1. 같은 타입의 컴포넌트가 중첩되는 경우 부모를 건너뛰고 자식만 렌더링
+      if (parentComponent && parentComponent.name === component.name) {
+        // 같은 타입 중첩 방지 - 자식만 렌더링
+        if (node.children) {
+          for (const child of node.children) {
+            jsx += this.generateReactJSX(child, mappedComponents, indent, component);
+          }
+        } else if (node.characters) {
+          // 텍스트만 있는 경우 직접 반환
+          return `${indentStr}${node.characters}\n`;
         }
-      } else if (node.characters) {
-        jsx += `${indentStr}  ${node.characters}\n`;
+        return jsx;
       }
       
-      jsx += `${indentStr}</${component.name}>\n`;
-    } else {
-      // 일반적인 패턴 기반 유사 매칭을 사용하므로 이 경우는 절대 발생하지 않음
-      console.warn(`No Design System component found for node ${node.id}, using Card as fallback`);
-      const fallbackComponent = this.designSystemService.getComponent('Card', 'react');
-      if (fallbackComponent) {
-        jsx += `${indentStr}<${fallbackComponent.name}>\n`;
+      // 2. div 컨테이너는 가능한 한 건너뛰기 (자식이 하나만 있는 경우)
+      if (component.name === 'div') {
+        // 빈 div 제거
+        if (!node.children && !node.characters) {
+          return '';
+        }
+        
+        // 자식이 하나만 있고 그 자식도 div가 아닌 경우 div를 건너뛰기
+        if (node.children && node.children.length === 1) {
+          const singleChild = node.children[0];
+          const childMapping = mappedComponents.find(m => m.figmaNode.id === singleChild.id);
+          if (childMapping && childMapping.designSystemComponent.name !== 'div') {
+            // div를 건너뛰고 자식만 렌더링
+            return this.generateReactJSX(singleChild, mappedComponents, indent, component);
+          }
+        }
+        
+        // 여러 자식이 있거나 자식이 div인 경우에만 div 사용
+        // className은 추가하지 않음 (불필요한 className 방지)
+        const style = this.generateInlineStyle(node);
+        jsx += `${indentStr}<div${style}>\n`;
         
         if (node.children) {
           for (const child of node.children) {
-            jsx += this.generateReactJSX(child, mappedComponents, indent + 1);
+            jsx += this.generateReactJSX(child, mappedComponents, indent + 1, component);
           }
         } else if (node.characters) {
           jsx += `${indentStr}  ${node.characters}\n`;
         }
         
-        jsx += `${indentStr}</${fallbackComponent.name}>\n`;
+        jsx += `${indentStr}</div>\n`;
+        return jsx;
       }
+      
+      // 3. 빈 컴포넌트 제거
+      const hasChildren = node.children && node.children.length > 0;
+      const hasText = node.characters && node.characters.trim().length > 0;
+      
+      if (!hasChildren && !hasText) {
+        if (['Button', 'Chip', 'Badge', 'Tag', 'Icon'].includes(component.name)) {
+          return '';
+        }
+        if (component.name === 'Text' || component.name === 'TextLink') {
+          return '';
+        }
+      }
+      
+      // 4. 자식이 하나만 있고 같은 타입이 아닌 경우 중간 노드 건너뛰기 고려
+      // 단, Chip, Badge, Tag는 텍스트를 children으로 받으므로 예외
+      if (hasChildren && node.children && node.children.length === 1 && !hasText) {
+        const singleChild = node.children[0];
+        const childMapping = mappedComponents.find(m => m.figmaNode.id === singleChild.id);
+        
+        // Chip, Badge, Tag는 텍스트를 children으로 받으므로 중간 노드 건너뛰지 않음
+        if (['Chip', 'Badge', 'Tag'].includes(component.name)) {
+          // Chip/Badge/Tag 안에 Text가 있으면 Text를 children으로 사용
+          if (childMapping && childMapping.designSystemComponent.name === 'Text' && singleChild.characters) {
+            // Text 노드의 텍스트를 직접 children으로 사용
+            const props = this.generateComponentProps(node, component);
+            jsx += `${indentStr}<${component.name}${props}>\n`;
+            jsx += `${indentStr}  ${singleChild.characters}\n`;
+            jsx += `${indentStr}</${component.name}>\n`;
+            return jsx;
+          }
+        }
+        
+        // 자식이 같은 타입이 아니고, 자식이 텍스트나 의미있는 컴포넌트인 경우
+        if (childMapping && childMapping.designSystemComponent.name !== component.name) {
+          // 부모 컴포넌트의 props를 자식에 병합할 수 있는지 확인
+          // 단순 컨테이너 역할만 하는 경우 자식만 렌더링
+          if (this.isSimpleContainer(component, node)) {
+            return this.generateReactJSX(singleChild, mappedComponents, indent, component);
+          }
+        }
+      }
+      
+      // 5. 디자인 시스템 컴포넌트 렌더링
+      const props = this.generateComponentProps(node, component);
+      
+      // Chip, Badge, Tag는 자식이 Text인 경우 텍스트만 추출
+      // 또는 자식이 Button이고 그 안에 Text나 Tag가 있는 경우 Button을 제거
+      if (['Chip', 'Badge', 'Tag'].includes(component.name) && hasChildren && !hasText && node.children) {
+        // 자식이 모두 Button이고 그 안에 Text나 Tag가 있는 경우 Button 제거
+        const buttonChildren = node.children.filter(child => {
+          const childMapping = mappedComponents.find(m => m.figmaNode.id === child.id);
+          return childMapping && childMapping.designSystemComponent.name === 'Button';
+        });
+        
+        if (buttonChildren.length === node.children.length && buttonChildren.length > 0) {
+          // Button의 자식을 직접 사용
+          const directChildren: FigmaNode[] = [];
+          for (const buttonChild of buttonChildren) {
+            if (buttonChild.children) {
+              directChildren.push(...buttonChild.children);
+            }
+          }
+          
+          // 직접 자식이 모두 Text나 Tag인 경우
+          if (directChildren.length > 0) {
+            const textOrTagChildren = directChildren.filter(child => {
+              const childMapping = mappedComponents.find(m => m.figmaNode.id === child.id);
+              return childMapping && 
+                     (childMapping.designSystemComponent.name === 'Text' || 
+                      childMapping.designSystemComponent.name === 'Tag' ||
+                      child.characters);
+            });
+            
+            // Button을 제거하고 직접 자식만 사용
+            if (textOrTagChildren.length > 0) {
+              jsx += `${indentStr}<${component.name}${props}>\n`;
+              for (const child of directChildren) {
+                jsx += this.generateReactJSX(child, mappedComponents, indent + 1, component);
+              }
+              jsx += `${indentStr}</${component.name}>\n`;
+              return jsx;
+            }
+          }
+        }
+        
+        // 자식이 모두 Text인 경우 텍스트만 children으로 사용
+        const textChildren = node.children ? node.children.filter((child: FigmaNode) => {
+          const childMapping = mappedComponents.find(m => m.figmaNode.id === child.id);
+          return childMapping && 
+                 (childMapping.designSystemComponent.name === 'Text' || 
+                  child.characters);
+        }) : [];
+        
+        if (node.children && textChildren.length === node.children.length && textChildren.length > 0) {
+          const textContent = textChildren
+            .map((child: FigmaNode) => child.characters || '')
+            .filter((text: string) => text.trim().length > 0)
+            .join(' ');
+          
+          if (textContent) {
+            jsx += `${indentStr}<${component.name}${props}>\n`;
+            jsx += `${indentStr}  ${textContent}\n`;
+            jsx += `${indentStr}</${component.name}>\n`;
+            return jsx;
+          }
+        }
+      }
+      
+      jsx += `${indentStr}<${component.name}${props}>\n`;
+      
+      if (hasChildren && node.children) {
+        for (const child of node.children) {
+          jsx += this.generateReactJSX(child, mappedComponents, indent + 1, component);
+        }
+      } else if (hasText) {
+        jsx += `${indentStr}  ${node.characters}\n`;
+      }
+      
+      jsx += `${indentStr}</${component.name}>\n`;
+    } else {
+      // 매핑이 없는 경우 div로 처리
+      if (!node.children && !node.characters) {
+        return '';
+      }
+      
+      // 자식이 하나만 있는 경우 div를 건너뛰기
+      if (node.children && node.children.length === 1 && !node.characters) {
+        return this.generateReactJSX(node.children[0], mappedComponents, indent, parentComponent);
+      }
+      
+      // className은 추가하지 않음 (불필요한 className 방지)
+      const style = this.generateInlineStyle(node);
+      jsx += `${indentStr}<div${style}>\n`;
+      
+      if (node.children) {
+        for (const child of node.children) {
+          jsx += this.generateReactJSX(child, mappedComponents, indent + 1, parentComponent);
+        }
+      } else if (node.characters) {
+        jsx += `${indentStr}  ${node.characters}\n`;
+      }
+      
+      jsx += `${indentStr}</div>\n`;
     }
 
     return jsx;
+  }
+
+  /**
+   * 컴포넌트가 단순 컨테이너 역할만 하는지 확인
+   */
+  private isSimpleContainer(
+    component: DesignSystemComponent,
+    node: FigmaNode
+  ): boolean {
+    // div는 항상 컨테이너
+    if (component.name === 'div') return true;
+    
+    // Button이 텍스트나 의미있는 자식 없이 자식만 있는 경우 컨테이너로 간주
+    if (component.name === 'Button' && !node.characters && node.children) {
+      // 자식이 모두 빈 노드가 아닌 경우에만 컨테이너로 간주
+      return true;
+    }
+    
+    // Chip, Badge, Tag도 비슷하게 처리
+    if (['Chip', 'Badge', 'Tag'].includes(component.name) && !node.characters && node.children) {
+      return true;
+    }
+    
+    return false;
   }
 
   /**
@@ -652,8 +1083,8 @@ export class CodeGenerator {
       template += `${indentStr}</${component.name}>\n`;
     } else {
       // 일반적인 패턴 기반 유사 매칭을 사용하므로 이 경우는 절대 발생하지 않음
-      console.warn(`No Design System component found for node ${node.id}, using Card as fallback`);
-      const fallbackComponent = this.designSystemService.getComponent('Card', 'vue');
+      console.warn(`No Design System component found for node ${node.id}, using Button as fallback`);
+      const fallbackComponent = this.designSystemService.getComponent('Button', 'vue');
       if (fallbackComponent) {
         template += `${indentStr}<${fallbackComponent.name}>\n`;
         
@@ -681,18 +1112,13 @@ export class CodeGenerator {
   ): string {
     const props: string[] = [];
 
-    // 노드 속성에 따라 공통 속성 추가
-    if (node.characters && component.name === 'Button') {
-      props.push(`>${node.characters}`);
-    }
-
+    // Input 컴포넌트의 경우 placeholder 추가
     if (node.characters && component.name === 'Input') {
       props.push(`placeholder="${node.characters}"`);
     }
 
-    if (component.name === 'Card' && node.name.toLowerCase().includes('title')) {
-      props.push(`title="${node.characters || node.name}"`);
-    }
+    // Text 컴포넌트의 경우 children으로 텍스트 전달 (props가 아닌)
+    // Text 컴포넌트는 children으로 텍스트를 받으므로 props에 추가하지 않음
 
     // 바운딩 박스에 따라 크기 속성 추가
     if (node.absoluteBoundingBox) {
@@ -701,7 +1127,21 @@ export class CodeGenerator {
       if (component.name === 'Button') {
         if (height < 32) props.push('size="small"');
         else if (height > 48) props.push('size="large"');
-        else props.push('size="medium"');
+        else if (height >= 32) props.push('size="medium"');
+      }
+      
+      // Chip, Badge, Tag도 크기 속성 지원하는 경우
+      if (component.name === 'Chip' || component.name === 'Badge' || component.name === 'Tag') {
+        if (height < 24) props.push('size="small"');
+        else if (height > 32) props.push('size="large"');
+      }
+    }
+
+    // Accordion의 경우 title prop 추가
+    if (component.name === 'Accordion' && node.children && node.children.length > 0) {
+      const firstTextChild = node.children.find(child => child.type === 'TEXT' || child.characters);
+      if (firstTextChild && firstTextChild.characters) {
+        props.push(`title="${firstTextChild.characters}"`);
       }
     }
 

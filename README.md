@@ -6,7 +6,8 @@ Figma 디자인을 기존 Design System 컴포넌트를 활용하여 React/Vue �
 
 ## 기능
 
-- 🎨 **Figma 연동**: Figma API를 통해 디자인 파일 분석
+- 🎨 **Figma 연동**: Figma Desktop MCP 서버 또는 REST API를 통해 디자인 파일 분석
+- 🔌 **MCP 통합**: Figma Desktop MCP 서버를 우선 사용하고, 실패 시 REST API로 자동 폴백
 - ⚛️ **React 코드 생성**: 기존 Design System 컴포넌트를 활용한 React 컴포넌트 생성
 - 🖖 **Vue 코드 생성**: 기존 Design System 컴포넌트를 활용한 Vue 컴포넌트 생성
 - 🔍 **컴포넌트 매핑**: Figma 컴포넌트와 Design System 컴포넌트 자동 매핑
@@ -41,13 +42,23 @@ yarn build
 
 ```env
 FIGMA_ACCESS_TOKEN=your_figma_access_token_here
+
+# 선택사항: Figma Desktop MCP 서버 설정
+FIGMA_MCP_SERVER_URL=http://127.0.0.1:3845/mcp
+USE_FIGMA_MCP=true
 ```
 
 2. Figma Access Token 발급:
    - Figma → Settings → Account → Personal Access Tokens
    - 새 토큰 생성 후 `.env` 파일에 추가
 
-3. Cursor IDE MCP 설정:
+3. (선택사항) Figma Desktop MCP 서버 활성화:
+   - Figma Desktop 앱 실행
+   - 환경설정(Preferences) → Dev Mode MCP 서버 활성화
+   - MCP 서버가 활성화되면 자동으로 `http://127.0.0.1:3845/mcp`에서 실행됩니다
+   - MCP 서버가 사용 불가능한 경우 자동으로 REST API로 폴백됩니다
+
+4. Cursor IDE MCP 설정:
    - 자동 설치 스크립트가 설정을 자동으로 처리합니다
    - 수동 설정이 필요한 경우 `INSTALLATION.md` 참고
 
@@ -134,10 +145,18 @@ analyze_figma_file
 src/
 ├── index.ts                 # MCP 서버 메인 파일
 ├── services/
-│   ├── figma.ts          # Figma API 연동 서비스
+│   ├── figma.ts          # Figma MCP/REST API 연동 서비스
 │   ├── design-system.ts  # Design System 컴포넌트 관리
 │   └── code-generator.ts # React/Vue 코드 생성
+└── utils/
+    └── figma-mcp-client.ts # Figma Desktop MCP 클라이언트
 ```
+
+### Figma 데이터 가져오기 흐름
+
+1. **MCP 우선 사용**: Figma Desktop MCP 서버가 활성화되어 있으면 MCP를 통해 데이터 가져오기
+2. **자동 폴백**: MCP 서버 연결 실패 시 기존 REST API로 자동 전환
+3. **데이터 변환**: MCP 응답을 기존 `FigmaFile` 형식으로 변환하여 기존 코드와 호환성 유지
 
 ## 개발
 
