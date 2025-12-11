@@ -2,6 +2,27 @@
 # Local 서버 (npm 패키지로 배포됨)
 # 사용법: npx palette-mcp
 
+# 서버가 제공하는 Tools (Capabilities)
+tools:
+  - name: convert_figma_to_react
+    description: |
+      Figma 디자인을 React 컴포넌트로 변환합니다.
+      @dealicious/design-system-react 컴포넌트를 활용하여 
+      일관된 디자인 시스템 기반의 코드를 생성합니다.
+  - name: convert_figma_to_vue
+    description: |
+      Figma 디자인을 Vue 컴포넌트로 변환합니다.
+      @dealicious/design-system 컴포넌트를 활용하여 
+      일관된 디자인 시스템 기반의 코드를 생성합니다.
+  - name: list_design_system_components
+    description: |
+      디자인 시스템에서 사용 가능한 컴포넌트 목록을 조회합니다.
+      Button, Input, Tag, Chip, Check 등 다양한 UI 컴포넌트를 확인할 수 있습니다.
+  - name: analyze_figma_file
+    description: |
+      Figma 파일의 구조를 분석합니다.
+      페이지, 프레임, 컴포넌트 구성을 파악하여 변환 전 미리 확인할 수 있습니다.
+
 startCommand:
   type: stdio
   configSchema:
