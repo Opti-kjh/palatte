@@ -28,7 +28,7 @@
   <circle cx="322" cy="200" r="24" fill="#27C93F" />
   
   <!-- Code Symbol (</>) in the negative space or overlaid -->
-  <path d="M220 300L200 320L220 340" stroke="#2D3142" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M292 300L312 320L292 340" stroke="#2D3142" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M268 296L244 344" stroke="#2D3142" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M220 255L200 275L220 295" stroke="#2D3142" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M292 255L312 275L292 295" stroke="#2D3142" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M268 251L244 299" stroke="#2D3142" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
