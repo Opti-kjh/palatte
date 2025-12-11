@@ -1,56 +1,12 @@
 # Smithery.ai MCP Server Configuration
-# Local 서버 (npm 패키지로 배포됨)
-# 사용법: npx palette-mcp
+# https://smithery.ai/docs/build/config
+#
+# 이 서버는 두 가지 모드를 지원합니다:
+# - Remote: Smithery.ai에서 호스팅 (runtime: typescript)
+# - Local: npx palette-mcp로 직접 실행
 
-# 서버가 제공하는 Tools (Capabilities)
-tools:
-  - name: convert_figma_to_react
-    description: |
-      Figma 디자인을 React 컴포넌트로 변환합니다.
-      @dealicious/design-system-react 컴포넌트를 활용하여 
-      일관된 디자인 시스템 기반의 코드를 생성합니다.
-  - name: convert_figma_to_vue
-    description: |
-      Figma 디자인을 Vue 컴포넌트로 변환합니다.
-      @dealicious/design-system 컴포넌트를 활용하여 
-      일관된 디자인 시스템 기반의 코드를 생성합니다.
-  - name: list_design_system_components
-    description: |
-      디자인 시스템에서 사용 가능한 컴포넌트 목록을 조회합니다.
-      Button, Input, Tag, Chip, Check 등 다양한 UI 컴포넌트를 확인할 수 있습니다.
-  - name: analyze_figma_file
-    description: |
-      Figma 파일의 구조를 분석합니다.
-      페이지, 프레임, 컴포넌트 구성을 파악하여 변환 전 미리 확인할 수 있습니다.
+# TypeScript 런타임으로 Smithery 호스팅
+runtime: typescript
 
-startCommand:
-  type: stdio
-  configSchema:
-    type: object
-    properties:
-      FIGMA_ACCESS_TOKEN:
-        type: string
-        title: Figma Access Token
-        description: Figma Personal Access Token (https://www.figma.com/developers/api#access-tokens)
-      GITHUB_TOKEN:
-        type: string
-        title: GitHub Token
-        description: GitHub Personal Access Token for design system packages
-      FIGMA_MCP_SERVER_URL:
-        type: string
-        title: Figma MCP Server URL
-        description: Figma Dev Mode MCP server URL
-        default: "http://127.0.0.1:3845/mcp"
-    required:
-      - FIGMA_ACCESS_TOKEN
-      - GITHUB_TOKEN
-  commandFunction: |
-    (config) => ({
-      command: "npx",
-      args: ["-y", "palette-mcp"],
-      env: {
-        FIGMA_ACCESS_TOKEN: config.FIGMA_ACCESS_TOKEN,
-        GITHUB_TOKEN: config.GITHUB_TOKEN,
-        FIGMA_MCP_SERVER_URL: config.FIGMA_MCP_SERVER_URL || "http://127.0.0.1:3845/mcp"
-      }
-    })
+# Smithery가 로드할 모듈 (src/smithery.ts)
+# package.json의 "module" 필드와 연동됨
