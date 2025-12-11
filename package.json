@@ -1,6 +1,6 @@
 {
   "name": "palette-mcp",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "MCP server for converting Figma designs to React/Vue components using design system",
   "main": "dist/index.js",
   "module": "src/smithery.ts",
@@ -72,8 +72,10 @@
     "@modelcontextprotocol/sdk": "^0.4.0",
     "axios": "^1.6.0",
     "dotenv": "^17.2.3",
-    "puppeteer": "^21.0.0",
     "zod": "^3.22.0"
+  },
+  "optionalDependencies": {
+    "puppeteer": "^21.0.0"
   },
   "peerDependencies": {
     "@dealicious/design-system": "*",

@@ -1,7 +1,14 @@
 import { FigmaFile, FigmaNode } from './figma.js';
 import { DesignSystemService, DesignSystemComponent } from './design-system.js';
 import { saveFile, saveBinaryFile, saveMetadata, generateRequestId, getRequestFolderPath } from '../utils/request-manager.js';
-import puppeteer from 'puppeteer';
+
+// puppeteer는 optional dependency로, 없으면 이미지 프리뷰 기능이 비활성화됨
+let puppeteer: any = null;
+try {
+  puppeteer = (await import('puppeteer')).default;
+} catch (e) {
+  console.warn('puppeteer를 로드할 수 없습니다. 이미지 프리뷰 기능이 비활성화됩니다.');
+}
 
 export interface GeneratedComponent {
   name: string;
@@ -77,12 +84,19 @@ export class CodeGenerator {
 
   /**
    * HTML을 렌더링하여 이미지로 변환
+   * puppeteer가 없으면 빈 문자열 반환
    */
   private async generateImagePreview(
     htmlContent: string,
     componentName: string,
     requestId: string
   ): Promise<string> {
+    // puppeteer가 없으면 이미지 생성 불가
+    if (!puppeteer) {
+      console.warn('puppeteer가 설치되지 않아 이미지 프리뷰를 생성할 수 없습니다.');
+      return '';
+    }
+
     const browser = await puppeteer.launch({
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox']
