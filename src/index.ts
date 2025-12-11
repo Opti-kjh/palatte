@@ -41,26 +41,26 @@ const codeGenerator = new CodeGenerator(designSystemService);
 const tools: Tool[] = [
   {
     name: 'convert_figma_to_react',
-    description: 'Convert Figma design to React component using existing design system',
+    description: 'Figma 디자인을 디자인 시스템을 사용하여 React 컴포넌트로 변환합니다',
     inputSchema: {
       type: 'object',
       properties: {
         figmaUrl: {
           type: 'string',
-          description: 'Figma file URL or file ID',
+          description: 'Figma 파일 URL 또는 파일 ID',
         },
         nodeId: {
           type: 'string',
-          description: 'Specific node ID to convert (optional)',
+          description: '변환할 특정 노드 ID (선택사항)',
         },
         componentName: {
           type: 'string',
-          description: 'Name for the generated component',
+          description: '생성할 컴포넌트 이름',
         },
         previewType: {
           type: 'string',
           enum: ['html', 'image', 'both'],
-          description: 'Preview type: "html" for HTML file, "image" for PNG image, "both" for both (default: "both")',
+          description: '미리보기 타입: "html"은 HTML 파일, "image"는 PNG 이미지, "both"는 둘 다 (기본값: "both")',
           default: 'both',
         },
       },
@@ -69,26 +69,26 @@ const tools: Tool[] = [
   },
   {
     name: 'convert_figma_to_vue',
-    description: 'Convert Figma design to Vue component using existing design system',
+    description: 'Figma 디자인을 디자인 시스템을 사용하여 Vue 컴포넌트로 변환합니다',
     inputSchema: {
       type: 'object',
       properties: {
         figmaUrl: {
           type: 'string',
-          description: 'Figma file URL or file ID',
+          description: 'Figma 파일 URL 또는 파일 ID',
         },
         nodeId: {
           type: 'string',
-          description: 'Specific node ID to convert (optional)',
+          description: '변환할 특정 노드 ID (선택사항)',
         },
         componentName: {
           type: 'string',
-          description: 'Name for the generated component',
+          description: '생성할 컴포넌트 이름',
         },
         previewType: {
           type: 'string',
           enum: ['html', 'image', 'both'],
-          description: 'Preview type: "html" for HTML file, "image" for PNG image, "both" for both (default: "both")',
+          description: '미리보기 타입: "html"은 HTML 파일, "image"는 PNG 이미지, "both"는 둘 다 (기본값: "both")',
           default: 'both',
         },
       },
@@ -97,14 +97,14 @@ const tools: Tool[] = [
   },
   {
     name: 'list_design_system_components',
-    description: 'List available components in the design system',
+    description: '디자인 시스템에서 사용 가능한 컴포넌트 목록을 조회합니다',
     inputSchema: {
       type: 'object',
       properties: {
         framework: {
           type: 'string',
           enum: ['react', 'vue'],
-          description: 'Framework to list components for',
+          description: '컴포넌트를 조회할 프레임워크',
         },
       },
       required: ['framework'],
@@ -112,13 +112,13 @@ const tools: Tool[] = [
   },
   {
     name: 'analyze_figma_file',
-    description: 'Analyze Figma file structure and available components',
+    description: 'Figma 파일 구조와 사용 가능한 컴포넌트를 분석합니다',
     inputSchema: {
       type: 'object',
       properties: {
         figmaUrl: {
           type: 'string',
-          description: 'Figma file URL or file ID',
+          description: 'Figma 파일 URL 또는 파일 ID',
         },
       },
       required: ['figmaUrl'],
