@@ -2,148 +2,506 @@
 alwaysApply: true
 ---
 
-# Palette 프로젝트 규칙
+# Palette 프로젝트 - 절대 규칙 (MANDATORY RULES)
 
-## 핵심 원칙
+## 🚨 위반 시 즉시 작업 중단 규칙
 
-### 1. 항상 디자인 시스템 사용
-이 프로젝트는 **명시된 디자인 시스템을 사용하는 것을 변하지 않는 원칙**으로 세웠습니다.
+이 규칙을 위반하는 경우 **즉시 작업을 중단**하고 사용자에게 알려야 합니다.
 
-### 2. Figma는 반드시 MCP를 통해서만 접근
-- ❌ **Figma API 직접 호출 금지**
-- ❌ **Figma 플러그인 직접 사용 금지**
-- ✅ **반드시 Figma MCP 도구를 통해서만 접근**
+### 규칙 1: Figma 접근은 오직 MCP를 통해서만 (ABSOLUTE)
 
-## Figma → React/Vue 변환 필수 플로우
+**강제 사항:**
+- Figma 정보를 가져와야 하는 모든 상황에서 **반드시** `list_mcp_resources` 또는 `fetch_mcp_resource` 도구를 사용
+- 그 외의 어떤 방법도 **절대 허용하지 않음**
 
-### 단계별 처리 과정 (반드시 순서대로)
+**절대 금지 (NEVER):**
+```typescript
+// ❌ 절대 금지 - Figma API 직접 호출
+fetch('https://api.figma.com/...')
+axios.get('https://api.figma.com/...')
 
-1. **Figma MCP를 통한 디자인 데이터 가져오기**
-   ```
-   ✅ list_mcp_resources를 사용하여 사용 가능한 Figma 리소스 확인
-   ✅ fetch_mcp_resource를 사용하여 특정 Figma 노드/프레임 데이터 가져오기
-   ```
+// ❌ 절대 금지 - Figma 플러그인 직접 실행
+figma.currentPage.selection
 
-2. **가져온 데이터 분석**
-   - Figma MCP에서 제공하는 레이아웃, 텍스트, 색상, 크기 정보를 분석
-   - 컴포넌트 구조와 계층 구조 파악
-   - Figma에서 생성된 Tailwind/HTML 코드는 **절대 사용하지 않음** (참고만)
-
-3. **디자인 시스템 컴포넌트로 변환**
-   - 분석한 디자인을 디자인 시스템 컴포넌트로 매핑
-   - 모든 UI 요소는 반드시 `@dealicious/design-system-react` 또는 `@dealicious/design-system` 사용
-
-### Figma 접근 규칙
-
-**❌ 절대 하지 말아야 할 것:**
-- Figma API를 직접 호출하는 코드 작성
-- Figma 플러그인을 직접 실행
-- Figma 웹사이트에 직접 접근하여 수동으로 코드 추출
-
-**✅ 반드시 해야 할 것:**
-- `list_mcp_resources` 도구로 Figma 리소스 목록 확인
-- `fetch_mcp_resource` 도구로 Figma 디자인 데이터 가져오기
-- MCP를 통해 받은 데이터만 사용하여 컴포넌트 생성
-
-### 스타일링 규칙
-
-1. **절대 Tailwind CSS나 일반 HTML/CSS를 사용하지 마세요**
-   - ❌ `<div className="bg-white p-4">` 같은 Tailwind 클래스 사용 금지
-   - ❌ 인라인 스타일만 사용하는 일반 React 컴포넌트 생성 금지
-   - ✅ 반드시 `@dealicious/design-system-react` 또는 `@dealicious/design-system` 컴포넌트 사용
-
-2. **디자인 시스템 컴포넌트 Import 필수**
-   ```typescript
-   // ✅ 올바른 방식
-   import { Button } from '@dealicious/design-system-react/src/components/ssm-button';
-   import { Text } from '@dealicious/design-system-react/src/components/ssm-text';
-   import { Tag } from '@dealicious/design-system-react/src/components/ssm-tag';
-   import { Check } from '@dealicious/design-system-react/src/components/ssm-check';
-   import { Chip } from '@dealicious/design-system-react/src/components/ssm-chip';
-   ```
-
-3. **사용 가능한 디자인 시스템 컴포넌트**
-   - Button, Check, Chip, Tag, Text, Input, Dropdown, Icon
-   - LayerPopup, LayerAlert, Accordion, Tab
-   - Badge, LabeledText, TextLink, TextField
-   - Radio, Switch, Pagination, ArrowPagination
-   - Toast, Notice, Error, HelperText, LoadingSpinner, Tooltip
-
-### 코드 생성 시 체크리스트
-
-- [ ] Figma MCP 도구를 사용하여 디자인 데이터를 가져왔는가?
-- [ ] Figma API를 직접 호출하지 않았는가?
-- [ ] Tailwind CSS 클래스가 없는가?
-- [ ] 모든 UI 요소가 디자인 시스템 컴포넌트인가?
-- [ ] import 문에 디자인 시스템 경로가 포함되어 있는가?
-- [ ] 인라인 스타일은 최소한으로만 사용하는가?
-
-### 예시: 올바른 변환
-
-**Figma MCP에서 받은 데이터:**
-```json
-{
-  "type": "FRAME",
-  "name": "Button Container",
-  "children": [{
-    "type": "TEXT",
-    "characters": "클릭",
-    "fills": [{ "color": { "r": 1, "g": 1, "b": 1 } }]
-  }],
-  "fills": [{ "color": { "r": 0.2, "g": 0.4, "b": 1 } }],
-  "cornerRadius": 8
-}
+// ❌ 절대 금지 - 사용자에게 수동 추출 요청
+"Figma에서 코드를 복사해서 붙여넣어 주세요"
 ```
 
-**변환된 코드 (디자인 시스템):**
+**반드시 사용 (MUST USE):**
 ```typescript
-import { Button } from '@dealicious/design-system-react/src/components/ssm-button';
-import { Text } from '@dealicious/design-system-react/src/components/ssm-text';
-
-<div style={{ backgroundColor: '#fff', padding: '16px', borderRadius: '8px' }}>
-  <Button variant="primary">클릭</Button>
-</div>
-```
-
-## 사용자 요청 처리 가이드
-
-### "Figma를 React로 변환해줘" 요청 시:
-
-1. **먼저 Figma MCP로 리소스 확인**
-   - `list_mcp_resources` 도구를 사용하여 사용 가능한 Figma 파일/노드 확인
-   - 사용자에게 어떤 리소스를 변환할지 확인
-
-2. **Figma 데이터 가져오기**
-   - `fetch_mcp_resource` 도구로 특정 Figma 노드 데이터 가져오기
-   - 받은 데이터가 Tailwind나 일반 HTML이어도 **무시**
-
-3. **디자인 시스템으로 재작성**
-   - 디자인 시스템 컴포넌트를 사용하여 **처음부터 다시 작성**
-   - Figma의 구조와 내용만 참고하고, 스타일링은 100% 디자인 시스템으로
-
-4. **검증**
-   - 위의 체크리스트로 최종 검증
-   - Tailwind나 일반 HTML/CSS가 없는지 확인
-
-## 프로젝트 구조
-
-- 디자인 시스템 패키지: `@dealicious/design-system-react` (React), `@dealicious/design-system` (Vue)
-- GitHub 저장소: https://github.com/dealicious-inc/ssm-web
-- 설치 방법: `yarn add git+ssh://git@github.com/dealicious-inc/ssm-web.git#master`
-
-## MCP 도구 사용법
-
-### Figma 리소스 목록 확인
-```typescript
+// ✅ 올바른 방법 - MCP 리소스 목록 확인
 list_mcp_resources({ server: "figma" })
-```
 
-### Figma 특정 노드 데이터 가져오기
-```typescript
+// ✅ 올바른 방법 - MCP로 Figma 데이터 가져오기
 fetch_mcp_resource({ 
   server: "figma", 
   uri: "figma://file/{fileKey}/node/{nodeId}" 
 })
 ```
 
-이렇게 설정하면 Figma 변환 요청 시 항상 MCP를 통해 디자인 시스템을 사용합니다.
+### 규칙 2: 산출물은 오직 디자인 시스템으로만 (ABSOLUTE)
+
+**강제 사항:**
+- React/Vue 컴포넌트 생성 시 **반드시** `@dealicious/design-system-react` 또는 `@dealicious/design-system` 사용
+- Tailwind CSS, 일반 HTML/CSS는 **절대 사용 금지**
+
+**절대 금지 (NEVER):**
+```typescript
+// ❌ 절대 금지 - Tailwind CSS 사용
+<div className="bg-white p-4 rounded-lg shadow-md">
+  <button className="bg-blue-500 text-white px-4 py-2">클릭</button>
+</div>
+
+// ❌ 절대 금지 - 일반 HTML 태그만 사용
+<div style={{ backgroundColor: '#fff', padding: '16px' }}>
+  <button style={{ backgroundColor: '#3b82f6', color: '#fff' }}>클릭</button>
+</div>
+
+// ❌ 절대 금지 - MUI, Ant Design 등 다른 UI 라이브러리
+import { Button } from '@mui/material';
+import { Button } from 'antd';
+```
+
+**반드시 사용 (MUST USE):**
+```typescript
+// ✅ 올바른 방법 - 디자인 시스템 컴포넌트
+import { Button } from '@dealicious/design-system-react/src/components/ssm-button';
+import { Text } from '@dealicious/design-system-react/src/components/ssm-text';
+
+<div style={{ padding: '16px' }}>
+  <Button variant="primary">클릭</Button>
+</div>
+```
+
+## 📋 필수 작업 플로우 (MANDATORY WORKFLOW)
+
+Figma를 React/Vue로 변환하는 요청을 받으면 **반드시 이 순서대로** 진행:
+
+### Step 1: Figma MCP로 리소스 확인 (REQUIRED)
+
+
+```typescript
+// 1단계: 사용 가능한 Figma 리소스 확인
+list_mcp_resources({ server: "figma" })
+```
+
+**이 단계를 건너뛰면 안 됩니다!**
+
+### Step 2: Figma 데이터 가져오기 (REQUIRED)
+
+```typescript
+// 2단계: 특정 Figma 노드/프레임 데이터 가져오기
+fetch_mcp_resource({ 
+  server: "figma", 
+  uri: "figma://file/{fileKey}/node/{nodeId}" 
+})
+```
+
+**이 단계 없이 코드를 생성하면 안 됩니다!**
+
+### Step 3: 데이터 분석 및 매핑 (REQUIRED)
+
+MCP에서 받은 데이터를 분석하여 디자인 시스템 컴포넌트로 매핑:
+
+| Figma 요소 | 디자인 시스템 컴포넌트 |
+|-----------|---------------------|
+| Button | `ssm-button` |
+| Text | `ssm-text` |
+| Input Field | `ssm-input` |
+| Checkbox | `ssm-check` |
+| Radio Button | `ssm-radio` |
+| Dropdown | `ssm-dropdown` |
+| Tag/Label | `ssm-tag` |
+| Chip | `ssm-chip` |
+| Icon | `ssm-icon` |
+
+### Step 4: 디자인 시스템으로 코드 생성 (REQUIRED)
+
+```typescript
+// 4단계: 디자인 시스템 컴포넌트로 변환
+import { Button } from '@dealicious/design-system-react/src/components/ssm-button';
+import { Text } from '@dealicious/design-system-react/src/components/ssm-text';
+
+// Figma MCP 데이터 기반으로 컴포넌트 구성
+```
+
+**Tailwind나 일반 HTML로 생성하면 안 됩니다!**
+
+### Step 5: 최종 검증 (REQUIRED)
+
+생성된 코드가 다음 조건을 모두 만족하는지 확인:
+
+
+- [ ] **Figma MCP 사용 확인**: `list_mcp_resources` 또는 `fetch_mcp_resource`를 사용했는가?
+- [ ] **디자인 시스템 import 확인**: `@dealicious/design-system-react` 또는 `@dealicious/design-system`에서 import 했는가?
+- [ ] **Tailwind 금지 확인**: `className`에 Tailwind 클래스가 없는가?
+- [ ] **일반 HTML 금지 확인**: `<button>`, `<input>` 등 일반 HTML 태그 대신 디자인 시스템 컴포넌트를 사용했는가?
+- [ ] **다른 UI 라이브러리 금지 확인**: MUI, Ant Design 등 다른 라이브러리를 사용하지 않았는가?
+
+**이 중 하나라도 만족하지 않으면 코드를 제공하지 마세요!**
+
+## 🎯 사용 가능한 디자인 시스템 컴포넌트
+
+### 기본 컴포넌트
+- `ssm-button`: Button
+- `ssm-text`: Text
+- `ssm-input`: Input
+- `ssm-dropdown`: Dropdown
+- `ssm-icon`: Icon
+
+### 폼 컴포넌트
+- `ssm-check`: Checkbox
+- `ssm-radio`: Radio Button
+- `ssm-switch`: Switch
+- `ssm-text-field`: TextField
+
+### 표시 컴포넌트
+- `ssm-tag`: Tag
+- `ssm-chip`: Chip
+- `ssm-badge`: Badge
+- `ssm-tooltip`: Tooltip
+
+### 피드백 컴포넌트
+- `ssm-toast`: Toast
+- `ssm-notice`: Notice
+- `ssm-error`: Error
+- `ssm-helper-text`: HelperText
+- `ssm-loading-spinner`: LoadingSpinner
+
+### 레이아웃 컴포넌트
+- `ssm-layer-popup`: LayerPopup
+- `ssm-layer-alert`: LayerAlert
+- `ssm-accordion`: Accordion
+- `ssm-tab`: Tab
+
+### 내비게이션 컴포넌트
+- `ssm-pagination`: Pagination
+- `ssm-arrow-pagination`: ArrowPagination
+- `ssm-text-link`: TextLink
+
+### 복합 컴포넌트
+- `ssm-labeled-text`: LabeledText
+
+## 📝 올바른 코드 예시
+
+### React 컴포넌트 예시
+
+
+
+```typescript
+// ✅ 올바른 예시
+import React from 'react';
+import { Button } from '@dealicious/design-system-react/src/components/ssm-button';
+import { Text } from '@dealicious/design-system-react/src/components/ssm-text';
+import { Input } from '@dealicious/design-system-react/src/components/ssm-input';
+import { Check } from '@dealicious/design-system-react/src/components/ssm-check';
+
+export const LoginForm = () => {
+  return (
+    <div style={{ padding: '24px' }}>
+      <Text variant="h1">로그인</Text>
+      
+      <Input 
+        type="email" 
+        placeholder="이메일을 입력하세요"
+        style={{ marginTop: '16px' }}
+      />
+      
+      <Input 
+        type="password" 
+        placeholder="비밀번호를 입력하세요"
+        style={{ marginTop: '16px' }}
+      />
+      
+      <Check label="로그인 상태 유지" style={{ marginTop: '12px' }} />
+      
+      <Button 
+        variant="primary" 
+        style={{ marginTop: '24px', width: '100%' }}
+      >
+        로그인
+      </Button>
+    </div>
+  );
+};
+```
+
+### Vue 컴포넌트 예시
+
+```vue
+<!-- ✅ 올바른 예시 -->
+<template>
+  <div :style="{ padding: '24px' }">
+    <ssm-text variant="h1">로그인</ssm-text>
+    
+    <ssm-input 
+      type="email" 
+      placeholder="이메일을 입력하세요"
+      :style="{ marginTop: '16px' }"
+    />
+    
+    <ssm-input 
+      type="password" 
+      placeholder="비밀번호를 입력하세요"
+      :style="{ marginTop: '16px' }"
+    />
+    
+    <ssm-check label="로그인 상태 유지" :style="{ marginTop: '12px' }" />
+    
+    <ssm-button 
+      variant="primary" 
+      :style="{ marginTop: '24px', width: '100%' }"
+    >
+      로그인
+    </ssm-button>
+  </div>
+</template>
+
+<script>
+import { Text } from '@dealicious/design-system/src/components/ssm-text';
+import { Button } from '@dealicious/design-system/src/components/ssm-button';
+import { Input } from '@dealicious/design-system/src/components/ssm-input';
+import { Check } from '@dealicious/design-system/src/components/ssm-check';
+
+export default {
+  components: {
+    'ssm-text': Text,
+    'ssm-button': Button,
+    'ssm-input': Input,
+    'ssm-check': Check
+  }
+};
+</script>
+```
+
+## ❌ 잘못된 코드 예시 (절대 생성 금지)
+
+
+
+```typescript
+// ❌ 잘못된 예시 1 - Tailwind CSS 사용
+export const LoginForm = () => {
+  return (
+    <div className="p-6 bg-white rounded-lg shadow-md">
+      <h1 className="text-2xl font-bold">로그인</h1>
+      <input 
+        type="email" 
+        className="mt-4 px-4 py-2 border rounded w-full"
+        placeholder="이메일을 입력하세요"
+      />
+      <button className="mt-6 bg-blue-500 text-white px-4 py-2 rounded w-full">
+        로그인
+      </button>
+    </div>
+  );
+};
+
+// ❌ 잘못된 예시 2 - 일반 HTML만 사용
+export const LoginForm = () => {
+  return (
+    <div style={{ padding: '24px', backgroundColor: '#fff' }}>
+      <h1 style={{ fontSize: '24px', fontWeight: 'bold' }}>로그인</h1>
+      <input 
+        type="email" 
+        style={{ marginTop: '16px', padding: '8px', width: '100%' }}
+        placeholder="이메일을 입력하세요"
+      />
+      <button style={{ marginTop: '24px', backgroundColor: '#3b82f6', color: '#fff', width: '100%' }}>
+        로그인
+      </button>
+    </div>
+  );
+};
+
+// ❌ 잘못된 예시 3 - 다른 UI 라이브러리 사용
+import { Button, TextField } from '@mui/material';
+
+export const LoginForm = () => {
+  return (
+    <div>
+      <h1>로그인</h1>
+      <TextField type="email" placeholder="이메일" />
+      <Button variant="contained">로그인</Button>
+    </div>
+  );
+};
+```
+
+## 🔄 실제 변환 프로세스 예시
+
+사용자 요청: "Figma의 로그인 폼을 React로 변환해줘"
+
+### 1단계: MCP로 Figma 리소스 확인
+
+```typescript
+// AI가 실행해야 하는 첫 번째 도구
+list_mcp_resources({ server: "figma" })
+```
+
+**응답 예시:**
+```json
+[
+  {
+    "uri": "figma://file/ABC123/node/456:789",
+    "name": "Login Form",
+    "description": "Login form with email, password inputs"
+  }
+]
+```
+
+### 2단계: Figma 데이터 가져오기
+
+```typescript
+// AI가 실행해야 하는 두 번째 도구
+fetch_mcp_resource({ 
+  server: "figma", 
+  uri: "figma://file/ABC123/node/456:789" 
+})
+```
+
+**응답 예시:**
+```json
+{
+  "type": "FRAME",
+  "name": "Login Form",
+  "children": [
+    {
+      "type": "TEXT",
+      "characters": "로그인",
+      "style": { "fontSize": 24, "fontWeight": 700 }
+    },
+    {
+      "type": "TEXT_INPUT",
+      "placeholder": "이메일을 입력하세요",
+      "inputType": "email"
+    },
+    {
+      "type": "TEXT_INPUT",
+      "placeholder": "비밀번호를 입력하세요",
+      "inputType": "password"
+    },
+    {
+      "type": "BUTTON",
+      "text": "로그인",
+      "variant": "primary"
+    }
+  ]
+}
+```
+
+### 3단계: 디자인 시스템으로 변환
+
+
+
+```typescript
+// AI가 생성해야 하는 최종 코드 (디자인 시스템 사용)
+import React from 'react';
+import { Button } from '@dealicious/design-system-react/src/components/ssm-button';
+import { Text } from '@dealicious/design-system-react/src/components/ssm-text';
+import { Input } from '@dealicious/design-system-react/src/components/ssm-input';
+
+export const LoginForm = () => {
+  return (
+    <div style={{ padding: '24px' }}>
+      {/* Figma의 TEXT 노드 → ssm-text */}
+      <Text variant="h1">로그인</Text>
+      
+      {/* Figma의 TEXT_INPUT (email) → ssm-input */}
+      <Input 
+        type="email" 
+        placeholder="이메일을 입력하세요"
+        style={{ marginTop: '16px' }}
+      />
+      
+      {/* Figma의 TEXT_INPUT (password) → ssm-input */}
+      <Input 
+        type="password" 
+        placeholder="비밀번호를 입력하세요"
+        style={{ marginTop: '16px' }}
+      />
+      
+      {/* Figma의 BUTTON → ssm-button */}
+      <Button 
+        variant="primary" 
+        style={{ marginTop: '24px', width: '100%' }}
+      >
+        로그인
+      </Button>
+    </div>
+  );
+};
+```
+
+## 🚫 작업 중단 시나리오
+
+다음과 같은 상황에서는 **즉시 작업을 중단**하고 사용자에게 알려야 합니다:
+
+1. **Figma MCP 없이 작업하려는 경우**
+   - "Figma API 키를 제공해주세요" → ❌ 중단
+   - "Figma에서 코드를 복사해서 붙여넣어주세요" → ❌ 중단
+   - MCP를 사용하지 않고 바로 코드 생성 → ❌ 중단
+
+2. **디자인 시스템 없이 작업하려는 경우**
+   - Tailwind CSS로 코드 생성 → ❌ 중단
+   - 일반 HTML 태그로 코드 생성 → ❌ 중단
+   - MUI, Ant Design 등 다른 라이브러리 사용 → ❌ 중단
+
+3. **올바른 응답 예시**
+   ```
+   죄송합니다. 이 프로젝트는 반드시 Figma MCP를 통해 디자인 데이터를 가져와야 합니다.
+   
+   먼저 다음 단계를 진행하겠습니다:
+   1. list_mcp_resources로 사용 가능한 Figma 리소스 확인
+   2. fetch_mcp_resource로 해당 디자인 데이터 가져오기
+   3. @dealicious/design-system-react 컴포넌트로 변환
+   
+   진행하시겠습니까?
+   ```
+
+## 📚 프로젝트 구조 및 설치
+
+### 패키지 정보
+- **React**: `@dealicious/design-system-react`
+- **Vue**: `@dealicious/design-system`
+- **GitHub**: https://github.com/dealicious-inc/ssm-web
+
+### 설치 방법
+```bash
+# React 프로젝트
+yarn add git+ssh://git@github.com/dealicious-inc/ssm-web.git#master
+
+# Vue 프로젝트  
+yarn add git+ssh://git@github.com/dealicious-inc/ssm-web.git#master
+```
+
+### Import 경로
+```typescript
+// React
+import { ComponentName } from '@dealicious/design-system-react/src/components/ssm-component-name';
+
+// Vue
+import { ComponentName } from '@dealicious/design-system/src/components/ssm-component-name';
+```
+
+## 🎓 요약
+
+### 절대 기억할 것
+
+1. **Figma = MCP만 사용** (API 직접 호출 금지)
+2. **산출물 = 디자인 시스템만 사용** (Tailwind/HTML 금지)
+3. **필수 플로우**: MCP 리소스 확인 → 데이터 가져오기 → 디자인 시스템 변환 → 검증
+4. **위반 시 = 즉시 중단** (규칙 위반 코드 제공 금지)
+
+### 체크리스트 (매번 확인)
+
+- [ ] Figma MCP 도구 사용?
+- [ ] 디자인 시스템 컴포넌트 사용?
+- [ ] Tailwind CSS 없음?
+- [ ] 일반 HTML 태그 대신 디자인 시스템?
+- [ ] 다른 UI 라이브러리 사용 안 함?
+
+**모든 항목이 체크되어야만 코드를 제공할 수 있습니다.**
+
+---
+
+이 규칙은 프로젝트의 **핵심 아키텍처 원칙**이며, 어떤 상황에서도 예외가 없습니다.

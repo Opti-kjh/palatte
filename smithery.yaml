@@ -1,0 +1,78 @@
+# Smithery.ai MCP Server Configuration
+# https://smithery.ai/docs/config
+
+name: palette-mcp
+version: 1.0.0
+title: Palette - Figma to React/Vue Converter
+description: |
+  Convert Figma designs to React/Vue components using design system.
+  Supports @dealicious/design-system-react and @dealicious/design-system components.
+
+author:
+  name: KJH
+  email: kjh@deali.net
+
+repository: https://github.com/Opti-kjh/palatte
+
+# Transport configuration
+transport: stdio
+command: npx
+args:
+  - "-y"
+  - "@anthropic/palette-mcp"
+
+# Environment variables
+env:
+  - name: FIGMA_ACCESS_TOKEN
+    description: |
+      Figma Personal Access Token for API access.
+      Get it from: https://www.figma.com/developers/api#access-tokens
+    required: true
+    secret: true
+
+  - name: GITHUB_TOKEN
+    description: |
+      GitHub Personal Access Token for accessing private design system packages.
+      Only required if using @dealicious/design-system packages.
+      Get it from: https://github.com/settings/tokens
+    required: false
+    secret: true
+
+  - name: FIGMA_MCP_SERVER_URL
+    description: |
+      Optional: URL of the Figma MCP server if running locally.
+      Default: http://127.0.0.1:3845/mcp
+    required: false
+    default: "http://127.0.0.1:3845/mcp"
+
+# Available tools
+tools:
+  - name: convert_figma_to_react
+    description: Convert Figma design to React component using design system
+
+  - name: convert_figma_to_vue
+    description: Convert Figma design to Vue component using design system
+
+  - name: list_design_system_components
+    description: List available components in the design system
+
+  - name: analyze_figma_file
+    description: Analyze Figma file structure and available components
+
+# Categories for Smithery.ai marketplace
+categories:
+  - design
+  - development
+  - code-generation
+  - figma
+
+# Tags for discovery
+tags:
+  - figma
+  - react
+  - vue
+  - design-system
+  - component-library
+  - code-generation
+  - mcp
+  - cursor

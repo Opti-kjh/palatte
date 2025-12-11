@@ -1,21 +1,11 @@
 import React from 'react';
 // Design System 컴포넌트 import
-// 주의: 디자인 시스템 패키지가 설치되어 있어야 합니다.
-// 설치 방법: yarn add git+ssh://git@github.com/dealicious-inc/ssm-web.git#master
-// 또는: yarn add @dealicious/design-system-react
-// @ts-ignore - 디자인 시스템 패키지가 설치되면 타입 오류가 해결됩니다
 import { Button } from '@dealicious/design-system-react/src/components/ssm-button';
-// @ts-ignore
 import { Check } from '@dealicious/design-system-react/src/components/ssm-check';
-// @ts-ignore
 import { Chip } from '@dealicious/design-system-react/src/components/ssm-chip';
-// @ts-ignore
 import { Tag } from '@dealicious/design-system-react/src/components/ssm-tag';
-// @ts-ignore
 import { Text } from '@dealicious/design-system-react/src/components/ssm-text';
-// @ts-ignore
 import { Dropdown } from '@dealicious/design-system-react/src/components/ssm-dropdown';
-// @ts-ignore
 import { Icon } from '@dealicious/design-system-react/src/components/ssm-icon';
 
 // 이미지 상수 정의
