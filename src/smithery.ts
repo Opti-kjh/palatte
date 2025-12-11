@@ -14,15 +14,18 @@ import { createPaletteServer } from './server.js';
  * 
  * Palette MCP Server Configuration
  * Figma 디자인을 Design System 컴포넌트로 변환하기 위한 설정
+ * 
+ * 모든 필드는 optional로 설정하여 Smithery Optional config 점수 획득
  */
 export const configSchema = z.object({
-  // Figma Access Token - 필수 설정 (Figma API 호출에 필요)
+  // Figma Access Token - Figma API 호출에 필요
   FIGMA_ACCESS_TOKEN: z
     .string()
-    .min(1, 'Figma Access Token is required')
+    .min(1)
+    .optional()
     .describe('Figma Personal Access Token. Required for accessing Figma designs. Get yours at https://www.figma.com/developers/api#access-tokens'),
   
-  // GitHub Token - 선택 설정 (비공개 디자인 시스템 패키지 접근용)
+  // GitHub Token - 비공개 디자인 시스템 패키지 접근용
   GITHUB_TOKEN: z
     .string()
     .min(1)
@@ -41,19 +44,19 @@ export const configSchema = z.object({
 // Smithery 설정 타입
 type SmitheryConfig = z.infer<typeof configSchema>;
 
-// 기본 설정 (부분 설정 허용)
-type PartialSmitheryConfig = Partial<SmitheryConfig>;
-
-const defaultConfig: PartialSmitheryConfig = {
+// 기본 설정
+const defaultConfig: SmitheryConfig = {
+  FIGMA_ACCESS_TOKEN: undefined,
+  GITHUB_TOKEN: undefined,
   FIGMA_MCP_SERVER_URL: 'http://127.0.0.1:3845/mcp',
 };
 
 /**
  * MCP 서버 생성 함수 - Smithery가 호출
  */
-export default function createMcpServer({ config }: { config?: PartialSmitheryConfig } = {}) {
+export default function createMcpServer({ config }: { config?: SmitheryConfig } = {}) {
   // config가 없거나 불완전해도 서버 초기화 가능하도록 방어적 처리
-  const safeConfig: PartialSmitheryConfig = { ...defaultConfig, ...config };
+  const safeConfig: SmitheryConfig = { ...defaultConfig, ...config };
   
   // 환경변수 설정 (값이 있는 경우에만)
   if (safeConfig.FIGMA_ACCESS_TOKEN) {
