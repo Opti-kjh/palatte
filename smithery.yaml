@@ -5,6 +5,9 @@ runtime: "typescript"
 
 # Configuration schema for user settings (JSON Schema format)
 configSchema:
+  $schema: "http://json-schema.org/draft-07/schema#"
+  title: "Palette MCP Server Configuration"
+  description: "Configuration options for Palette MCP Server - Figma to Design System converter"
   type: "object"
   required:
     - "FIGMA_ACCESS_TOKEN"
@@ -33,3 +36,4 @@ configSchema:
       examples:
         - "http://127.0.0.1:3845/mcp"
         - "http://localhost:3845/mcp"
+  additionalProperties: false
