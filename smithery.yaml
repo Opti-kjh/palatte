@@ -39,7 +39,7 @@ startCommand:
   commandFunction: |
     (config) => ({
       command: "npx",
-      args: ["-y", "@anthropic/palette-mcp"],
+      args: ["-y", "palette-mcp"],
       env: {
         FIGMA_ACCESS_TOKEN: config.FIGMA_ACCESS_TOKEN,
         GITHUB_TOKEN: config.GITHUB_TOKEN,

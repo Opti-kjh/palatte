@@ -1,5 +1,5 @@
 {
-  "name": "@anthropic/palette-mcp",
+  "name": "palette-mcp",
   "version": "1.0.0",
   "description": "MCP server for converting Figma designs to React/Vue components using design system",
   "main": "dist/index.js",
@@ -9,7 +9,10 @@
     "palette-mcp": "./dist/index.js"
   },
   "files": [
-    "dist/**/*",
+    "dist/index.js",
+    "dist/index.d.ts",
+    "dist/services/**/*",
+    "dist/utils/**/*",
     "README.md",
     "LICENSE",
     "smithery.yaml"
