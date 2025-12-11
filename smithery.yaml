@@ -1,12 +1,8 @@
 # Smithery.ai MCP Server Configuration
 # https://smithery.ai/docs/build/config
-#
-# 이 서버는 두 가지 모드를 지원합니다:
-# - Remote: Smithery.ai에서 호스팅 (runtime: typescript)
-# - Local: npx palette-mcp로 직접 실행
 
 # TypeScript 런타임으로 Smithery 호스팅
 runtime: typescript
 
-# Smithery가 로드할 모듈 (src/smithery.ts)
-# package.json의 "module" 필드와 연동됨
+# Smithery가 로드할 TypeScript 모듈
+target: src/smithery.ts

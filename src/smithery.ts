@@ -29,7 +29,7 @@ type SmitheryConfig = z.infer<typeof configSchema>;
 /**
  * MCP 서버 생성 함수 - Smithery가 호출
  */
-function createMcpServer({ config }: { config: SmitheryConfig }) {
+export default function createMcpServer({ config }: { config: SmitheryConfig }) {
   // 환경변수 설정
   process.env.FIGMA_ACCESS_TOKEN = config.FIGMA_ACCESS_TOKEN;
   process.env.GITHUB_TOKEN = config.GITHUB_TOKEN;
@@ -47,12 +47,12 @@ function createMcpServer({ config }: { config: SmitheryConfig }) {
   return server;
 }
 
-// Smithery stateless 서버 생성 및 시작
-const { app } = createStatelessServer(createMcpServer);
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.error(`Palette MCP server listening on port ${port}`);
-});
-
-// Export for Smithery
-export default createMcpServer;
+// 직접 실행 시에만 서버 시작 (Smithery에서 import할 때는 실행 안됨)
+// Smithery는 createStatelessServer를 내부적으로 호출함
+if (process.env.SMITHERY_STANDALONE === 'true') {
+  const { app } = createStatelessServer(createMcpServer);
+  const port = process.env.PORT || 3000;
+  app.listen(port, () => {
+    console.error(`Palette MCP server listening on port ${port}`);
+  });
+}
