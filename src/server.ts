@@ -133,10 +133,17 @@ export function createPaletteServer(config: ServerConfig = {}): Server {
   }
 
   // MCP 서버 초기화
-  const server = new Server({
-    name: 'palette',
-    version: '1.0.0',
-  });
+  const server = new Server(
+    {
+      name: 'palette',
+      version: '1.0.0',
+    },
+    {
+      capabilities: {
+        tools: {},  // tools 기능 활성화
+      },
+    }
+  );
 
   // 서비스 초기화
   // Remote 모드에서는 Figma Desktop MCP 클라이언트를 사용하지 않음 (로컬호스트 접근 불가)
