@@ -1,48 +1,11 @@
-# Smithery.ai MCP Server Configuration
+# Smithery.ai MCP Server Configuration for TypeScript Runtime
 # https://smithery.ai/docs/build/config
 
-name: palette-mcp
-version: 1.0.0
-description: |
-  Convert Figma designs to React/Vue components using design system.
-  Supports @dealicious/design-system-react and @dealicious/design-system components.
-
-# Runtime specification (required)
 runtime: typescript
+target: src/index.ts
 
-# Start command configuration (required)
-startCommand:
-  type: stdio
-  configSchema:
-    type: object
-    properties:
-      FIGMA_ACCESS_TOKEN:
-        type: string
-        description: |
-          Figma Personal Access Token for API access.
-          Get it from: https://www.figma.com/developers/api#access-tokens
-      GITHUB_TOKEN:
-        type: string
-        description: |
-          GitHub Personal Access Token for accessing @dealicious/design-system packages.
-          Get it from: https://github.com/settings/tokens
-      FIGMA_MCP_SERVER_URL:
-        type: string
-        description: |
-          URL of the Figma MCP server (Figma Desktop Dev Mode).
-          Default: http://127.0.0.1:3845/mcp
-        default: "http://127.0.0.1:3845/mcp"
-    required:
-      - FIGMA_ACCESS_TOKEN
-      - GITHUB_TOKEN
-      - FIGMA_MCP_SERVER_URL
-  commandFunction: |
-    (config) => ({
-      command: "npx",
-      args: ["-y", "palette-mcp"],
-      env: {
-        FIGMA_ACCESS_TOKEN: config.FIGMA_ACCESS_TOKEN,
-        GITHUB_TOKEN: config.GITHUB_TOKEN,
-        FIGMA_MCP_SERVER_URL: config.FIGMA_MCP_SERVER_URL || "http://127.0.0.1:3845/mcp"
-      }
-    })
+# Environment variables (users will configure these during installation)
+env:
+  FIGMA_ACCESS_TOKEN: ""
+  GITHUB_TOKEN: ""
+  FIGMA_MCP_SERVER_URL: "http://127.0.0.1:3845/mcp"
