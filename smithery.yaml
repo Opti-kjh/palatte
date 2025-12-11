@@ -1,15 +1,35 @@
 # Smithery.ai MCP Server Configuration
-# npm 패키지 직접 사용 방식
-
-runtime: container
+# Local 서버 (npm 패키지로 배포됨)
+# 사용법: npx palette-mcp
 
 startCommand:
   type: stdio
-  command: npx
-  args:
-    - "-y"
-    - "palette-mcp"
-  env:
-    FIGMA_ACCESS_TOKEN: ""
-    GITHUB_TOKEN: ""
-    FIGMA_MCP_SERVER_URL: "http://127.0.0.1:3845/mcp"
+  configSchema:
+    type: object
+    properties:
+      FIGMA_ACCESS_TOKEN:
+        type: string
+        title: Figma Access Token
+        description: Figma Personal Access Token (https://www.figma.com/developers/api#access-tokens)
+      GITHUB_TOKEN:
+        type: string
+        title: GitHub Token
+        description: GitHub Personal Access Token for design system packages
+      FIGMA_MCP_SERVER_URL:
+        type: string
+        title: Figma MCP Server URL
+        description: Figma Dev Mode MCP server URL
+        default: "http://127.0.0.1:3845/mcp"
+    required:
+      - FIGMA_ACCESS_TOKEN
+      - GITHUB_TOKEN
+  commandFunction: |
+    (config) => ({
+      command: "npx",
+      args: ["-y", "palette-mcp"],
+      env: {
+        FIGMA_ACCESS_TOKEN: config.FIGMA_ACCESS_TOKEN,
+        GITHUB_TOKEN: config.GITHUB_TOKEN,
+        FIGMA_MCP_SERVER_URL: config.FIGMA_MCP_SERVER_URL || "http://127.0.0.1:3845/mcp"
+      }
+    })
