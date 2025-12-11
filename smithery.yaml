@@ -1,78 +1,61 @@
 # Smithery.ai MCP Server Configuration
-# https://smithery.ai/docs/config
+# https://smithery.ai/docs/build/config
 
 name: palette-mcp
 version: 1.0.0
-title: Palette - Figma to React/Vue Converter
 description: |
   Convert Figma designs to React/Vue components using design system.
   Supports @dealicious/design-system-react and @dealicious/design-system components.
 
-author:
-  name: KJH
-  email: kjh@deali.net
+# Runtime specification (required)
+runtime: node
 
-repository: https://github.com/Opti-kjh/palatte
+# Start command configuration (required)
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties:
+      FIGMA_ACCESS_TOKEN:
+        type: string
+        description: |
+          Figma Personal Access Token for API access.
+          Get it from: https://www.figma.com/developers/api#access-tokens
+      GITHUB_TOKEN:
+        type: string
+        description: |
+          GitHub Personal Access Token for accessing @dealicious/design-system packages.
+          Get it from: https://github.com/settings/tokens
+      FIGMA_MCP_SERVER_URL:
+        type: string
+        description: |
+          URL of the Figma MCP server (Figma Desktop Dev Mode).
+          Default: http://127.0.0.1:3845/mcp
+        default: "http://127.0.0.1:3845/mcp"
+    required:
+      - FIGMA_ACCESS_TOKEN
+      - GITHUB_TOKEN
+      - FIGMA_MCP_SERVER_URL
+  commandFunction: |
+    (config) => ({
+      command: "npx",
+      args: ["-y", "@anthropic/palette-mcp"],
+      env: {
+        FIGMA_ACCESS_TOKEN: config.FIGMA_ACCESS_TOKEN,
+        GITHUB_TOKEN: config.GITHUB_TOKEN,
+        FIGMA_MCP_SERVER_URL: config.FIGMA_MCP_SERVER_URL || "http://127.0.0.1:3845/mcp"
+      }
+    })
 
-# Transport configuration
-transport: stdio
-command: npx
-args:
-  - "-y"
-  - "@anthropic/palette-mcp"
-
-# Environment variables
+# Environment variables as object (for documentation)
 env:
-  - name: FIGMA_ACCESS_TOKEN
-    description: |
-      Figma Personal Access Token for API access.
-      Get it from: https://www.figma.com/developers/api#access-tokens
+  FIGMA_ACCESS_TOKEN:
+    description: Figma 개인 액세스 토큰 (필수)
     required: true
-    secret: true
-
-  - name: GITHUB_TOKEN
-    description: |
-      GitHub Personal Access Token for accessing private design system packages.
-      Only required if using @dealicious/design-system packages.
-      Get it from: https://github.com/settings/tokens
-    required: false
-    secret: true
-
-  - name: FIGMA_MCP_SERVER_URL
-    description: |
-      Optional: URL of the Figma MCP server if running locally.
-      Default: http://127.0.0.1:3845/mcp
-    required: false
+  GITHUB_TOKEN:
+    description: 디자인 시스템 패키지 접근용 GitHub 토큰 (필수)
+    required: true
+  FIGMA_MCP_SERVER_URL:
+    description: Figma MCP 서버 URL (필수)
+    required: true
     default: "http://127.0.0.1:3845/mcp"
-
-# Available tools
-tools:
-  - name: convert_figma_to_react
-    description: Convert Figma design to React component using design system
-
-  - name: convert_figma_to_vue
-    description: Convert Figma design to Vue component using design system
-
-  - name: list_design_system_components
-    description: List available components in the design system
-
-  - name: analyze_figma_file
-    description: Analyze Figma file structure and available components
-
-# Categories for Smithery.ai marketplace
-categories:
-  - design
-  - development
-  - code-generation
-  - figma
-
-# Tags for discovery
-tags:
-  - figma
-  - react
-  - vue
-  - design-system
-  - component-library
-  - code-generation
-  - mcp
-  - cursor
