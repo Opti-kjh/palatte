@@ -16,7 +16,7 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import { readFile } from 'fs/promises';
 import { FigmaService } from './services/figma.js';
-import { DesignSystemService } from './services/design-system.js';
+import { DesignSystemService, type SyncConfig } from './services/design-system.js';
 import { CodeGenerator, type PreviewType } from './services/code-generator.js';
 
 // 서버 설정 타입
@@ -24,11 +24,15 @@ export interface ServerConfig {
   figmaAccessToken?: string;
   githubToken?: string;
   figmaMcpServerUrl?: string;
-  /** 
+  /**
    * Figma Desktop MCP 클라이언트 사용 여부
    * Remote 모드(Smithery)에서는 false로 설정해야 함 (로컬호스트 접근 불가)
    */
   useFigmaMcp?: boolean;
+  /**
+   * 디자인 시스템 컴포넌트 동기화 설정
+   */
+  syncConfig?: SyncConfig;
 }
 
 // Tools 정의 (annotations 포함)
@@ -235,8 +239,13 @@ export function createPaletteServer(config: ServerConfig = {}): Server {
   // Remote 모드에서는 Figma Desktop MCP 클라이언트를 사용하지 않음 (로컬호스트 접근 불가)
   const useFigmaMcp = config.useFigmaMcp !== undefined ? config.useFigmaMcp : true;
   const figmaService = new FigmaService(useFigmaMcp, config.figmaMcpServerUrl);
-  const designSystemService = new DesignSystemService();
+  const designSystemService = new DesignSystemService(config.syncConfig);
   const codeGenerator = new CodeGenerator(designSystemService);
+
+  // 디자인 시스템 컴포넌트 비동기 초기화 (백그라운드에서 실행)
+  designSystemService.initialize().catch((error) => {
+    console.error('[Palette] 디자인 시스템 초기화 실패:', error);
+  });
 
   // ===== Tools 핸들러 =====
   server.setRequestHandler(ListToolsRequestSchema, async () => {

@@ -1,3 +1,5 @@
+import { ComponentSyncService, type SyncResult } from '../sync/index.js';
+
 export interface DesignSystemComponent {
   name: string;
   description: string;
@@ -22,12 +24,115 @@ export interface ComponentExample {
   description: string;
 }
 
+export interface SyncConfig {
+  /** 서버 시작 시 자동 동기화 여부 (기본값: true) */
+  autoSync?: boolean;
+  /** 동기화 상세 로그 출력 여부 */
+  verbose?: boolean;
+}
+
 export class DesignSystemService {
   private reactComponents: DesignSystemComponent[] = [];
   private vueComponents: DesignSystemComponent[] = [];
+  private syncService: ComponentSyncService;
+  private syncConfig: SyncConfig;
+  private initialized: boolean = false;
+  private lastSyncResult: SyncResult | null = null;
 
-  constructor() {
+  constructor(syncConfig: SyncConfig = {}) {
+    this.syncConfig = {
+      autoSync: syncConfig.autoSync ?? true,
+      verbose: syncConfig.verbose ?? false,
+    };
+    this.syncService = new ComponentSyncService();
+
+    // 하드코딩된 기본 컴포넌트 초기화 (폴백용)
     this.initializeComponents();
+  }
+
+  /**
+   * 서비스 초기화 (비동기)
+   * 서버 시작 시 호출하여 GitHub에서 최신 컴포넌트 동기화
+   */
+  async initialize(): Promise<void> {
+    if (this.initialized) {
+      return;
+    }
+
+    if (this.syncConfig.autoSync) {
+      try {
+        console.log('[DesignSystem] 컴포넌트 동기화 시작...');
+        const result = await this.syncService.sync({
+          verbose: this.syncConfig.verbose,
+        });
+
+        this.lastSyncResult = result;
+
+        if (result.success) {
+          if (result.reactComponents.length > 0) {
+            this.reactComponents = result.reactComponents;
+          }
+          if (result.vueComponents.length > 0) {
+            this.vueComponents = result.vueComponents;
+          }
+
+          console.log(
+            `[DesignSystem] 동기화 완료: React ${this.reactComponents.length}개, Vue ${this.vueComponents.length}개` +
+            (result.fromCache ? ' (캐시에서 로드)' : ' (GitHub에서 동기화)')
+          );
+        } else {
+          console.warn('[DesignSystem] 동기화 실패, 하드코딩된 데이터 사용:', result.error);
+        }
+      } catch (error) {
+        console.warn('[DesignSystem] 동기화 중 오류, 하드코딩된 데이터 사용:', error);
+      }
+    }
+
+    this.initialized = true;
+  }
+
+  /**
+   * 수동 동기화 실행
+   */
+  async syncComponents(force: boolean = false): Promise<SyncResult> {
+    const result = await this.syncService.sync({
+      force,
+      verbose: this.syncConfig.verbose,
+    });
+
+    this.lastSyncResult = result;
+
+    if (result.success) {
+      if (result.reactComponents.length > 0) {
+        this.reactComponents = result.reactComponents;
+      }
+      if (result.vueComponents.length > 0) {
+        this.vueComponents = result.vueComponents;
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * 마지막 동기화 결과 조회
+   */
+  getLastSyncResult(): SyncResult | null {
+    return this.lastSyncResult;
+  }
+
+  /**
+   * 캐시 상태 조회
+   */
+  async getCacheStatus() {
+    return this.syncService.getCacheStatus();
+  }
+
+  /**
+   * 캐시 삭제
+   */
+  async clearCache(): Promise<void> {
+    await this.syncService.clearCache();
   }
 
   /**
