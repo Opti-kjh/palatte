@@ -2,6 +2,7 @@
 
 Figma 디자인을 기존 Design System 컴포넌트를 활용하여 React/Vue 코드로 변환하는 MCP(Model Context Protocol) 서버입니다.
 
+[![smithery badge](https://smithery.ai/badge/@Opti-kjh/palette)](https://smithery.ai/server/@Opti-kjh/palette)
 [![Smithery](https://img.shields.io/badge/Smithery-Install-blue)](https://smithery.ai/server/@anthropic/palette-mcp)
 [![npm version](https://img.shields.io/npm/v/@anthropic/palette-mcp.svg)](https://www.npmjs.com/package/@anthropic/palette-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
